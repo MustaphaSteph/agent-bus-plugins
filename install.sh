@@ -115,7 +115,7 @@ fi
 candidates() {
   if [ -n "$EXPLICIT_TARGET" ]; then
     printf "explicit:%s\n" "$EXPLICIT_TARGET"
-    return
+    return 0
   fi
   [ -d "$HOME/.claude" ]   && printf "Claude Code:%s/.claude/skills\n"   "$HOME"
   [ -d "$HOME/.codex" ]    && printf "Codex:%s/.codex/skills\n"          "$HOME"
@@ -126,9 +126,13 @@ candidates() {
   [ -d "$HOME/.junie" ]    && printf "Junie:%s/.junie/skills\n"          "$HOME"
   [ -d "$HOME/.amp" ]      && printf "Amp:%s/.amp/skills\n"              "$HOME"
   [ -d "$HOME/.kiro" ]     && printf "Kiro:%s/.kiro/skills\n"            "$HOME"
+  # The last test above may evaluate false under set -e; explicit
+  # return 0 keeps the function from propagating that exit status to
+  # the command substitution.
+  return 0
 }
 
-CANDS="$(candidates)"
+CANDS="$(candidates || true)"
 if [ -z "$CANDS" ]; then
   printf "No skills-aware tool config dir detected under \$HOME.\n" >&2
   printf "Re-run with --target /path/to/skills/dir to install anyway, or install one of:\n" >&2

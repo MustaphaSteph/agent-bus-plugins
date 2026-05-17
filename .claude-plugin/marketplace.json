@@ -17,8 +17,7 @@
       "source": {
         "source": "git-subdir",
         "url": "https://github.com/MustaphaSteph/agent-bus-plugins.git",
-        "path": "claude-code/plugins/agent-bus",
-        "ref": "v0.4.0"
+        "path": "claude-code/plugins/agent-bus"
       },
       "homepage": "https://github.com/MustaphaSteph/agent-bus"
     }
