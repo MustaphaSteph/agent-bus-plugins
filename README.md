@@ -27,12 +27,15 @@ That puts `agent-bus` (CLI) and `agent-bus-mcp` (MCP stdio server) on your PATH.
 
 ## Install in Codex (CLI + Desktop)
 
+Step 1 — add the marketplace:
+
 ```bash
 codex plugin marketplace add MustaphaSteph/agent-bus-plugins
-codex plugin install agent-bus
 ```
 
 The Codex marketplace lives at the repo root (`.agents/plugins/marketplace.json`), so no `--sparse` flag needed.
+
+Step 2 — install the `agent-bus` plugin from Codex's plugin UI (in Codex CLI's interactive mode or Codex Desktop's plugin panel). Current Codex CLI builds expose only `codex plugin marketplace add/upgrade/remove` from the shell — the actual `install` action happens inside the agent UI. Once a future Codex CLI build ships a `codex plugin install <name>` subcommand, this step will also be runnable from a script.
 
 **Hooks note:** the listener-resume Stop hook ships **disabled by default**. To opt in, edit `~/.codex/config.toml`:
 
