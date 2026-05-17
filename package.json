@@ -1,0 +1,16 @@
+{
+  "name": "agent-bus-plugins",
+  "version": "0.4.0",
+  "private": true,
+  "description": "Codex and Claude Code plugins that bundle the agent-bus MCP server, slash commands, and the universal agent-bus skill.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MustaphaSteph/agent-bus-plugins.git"
+  },
+  "scripts": {
+    "sync-skill": "./scripts/sync-skill.sh",
+    "sync-skill:dev": "SYNC_SOURCE=../agent-bus ./scripts/sync-skill.sh",
+    "sync-skill:check": "./scripts/sync-skill.sh --check"
+  }
+}

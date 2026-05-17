@@ -1,0 +1,28 @@
+{
+  "$comment": [
+    "OPT-IN: Codex gates plugin-bundled hooks behind [features].plugin_hooks = true.",
+    "Enable in ~/.codex/config.toml with:",
+    "    [features]",
+    "    plugin_hooks = true",
+    "Then re-install or reload the plugin. The hook adds Stop-event listener-resume:",
+    "  - if the session is currently flagged as a listener (via `agent-bus mark-listening`)",
+    "  - and the inbox poll returned a pending message OR the session is in listener mode,",
+    "  - the hook returns decision=block with a 'continue inbox loop' prompt so Claude/Codex",
+    "    naturally re-enters the inbox loop instead of returning control to the user.",
+    "  - stop_hook_active guards against infinite loops within a single agent turn.",
+    "If you do not want this behavior, leave plugin_hooks disabled; agent-bus listener mode still works without it via the long-blocking inbox(wait_s=110) call alone."
+  ],
+  "Stop": [
+    {
+      "matcher": ".*",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "agent-bus poll-inbox --agent \"$AGENT_BUS_SESSION_AGENT\" --session \"$CODEX_SESSION_ID\" 2>/dev/null || true",
+          "stop_hook_active": true,
+          "description": "If this session is in listener mode and has pending messages (or just an empty inbox while listening), return decision=block to keep the agent in the inbox loop. Safe no-op when not in listener mode or when agent-bus is not installed."
+        }
+      ]
+    }
+  ]
+}

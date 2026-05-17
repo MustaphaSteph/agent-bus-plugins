@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "agent-bus": {
+      "command": "agent-bus-mcp",
+      "args": [],
+      "description": "Local message bus for agent-to-agent communication. Provides 20 tools across messaging, channels, capability routing, conversation threads, and first-class tasks."
+    }
+  }
+}

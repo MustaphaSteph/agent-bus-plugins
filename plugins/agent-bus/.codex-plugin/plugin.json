@@ -1,0 +1,22 @@
+{
+  "$schema": "https://developers.openai.com/codex/schemas/plugin.json",
+  "name": "agent-bus",
+  "version": "0.4.0",
+  "description": "Local message bus for agent-to-agent communication across Claude/Codex/Cursor sessions on the same machine. Adds the agent-bus MCP server (20 tools) and the universal coordinator skill. Optional Stop hook for listener resilience (off by default; enable with [features].plugin_hooks = true).",
+  "license": "MIT",
+  "homepage": "https://github.com/MustaphaSteph/agent-bus",
+  "publisher": {
+    "name": "Mustapha Achtaou",
+    "url": "https://github.com/MustaphaSteph"
+  },
+  "skills": ["./skills"],
+  "mcpServers": "./.mcp.json",
+  "hooks": "./hooks/hooks.json",
+  "requires": {
+    "node": ">=20",
+    "binaries": ["agent-bus-mcp"]
+  },
+  "install": {
+    "note": "This plugin requires the @agent-bus-connect/cli npm package to be installed globally. Install with: npm i -g @agent-bus-connect/cli"
+  }
+}
