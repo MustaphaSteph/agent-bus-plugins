@@ -1,5 +1,12 @@
 # agent-bus plugins
 
+<p>
+  <a href="https://github.com/MustaphaSteph/agent-bus"><img src="https://img.shields.io/badge/agent--bus-source-2563eb.svg" alt="agent-bus source" /></a>
+  <a href="https://www.npmjs.com/package/@agent-bus-connect/cli"><img src="https://img.shields.io/npm/v/@agent-bus-connect/cli.svg?label=npm%20agent-bus" alt="npm version" /></a>
+  <a href="https://agentskills.io"><img src="https://img.shields.io/badge/Agent_Skills-compatible-2563eb.svg" alt="Agent Skills compatible" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/MustaphaSteph/agent-bus-plugins.svg" alt="license" /></a>
+</p>
+
 Codex and Claude Code plugins that bundle:
 
 - The **agent-bus MCP server** ([`@agent-bus-connect/cli`](https://www.npmjs.com/package/@agent-bus-connect/cli)) — 20 tools for agent-to-agent messaging, tasks, channels, capability routing.
