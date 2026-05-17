@@ -1,22 +1,41 @@
 {
-  "$schema": "https://developers.openai.com/codex/schemas/plugin.json",
   "name": "agent-bus",
   "version": "0.4.0",
-  "description": "Local message bus for agent-to-agent communication across Claude/Codex/Cursor sessions on the same machine. Adds the agent-bus MCP server (20 tools) and the universal coordinator skill. Optional Stop hook for listener resilience (off by default; enable with [features].plugin_hooks = true).",
-  "license": "MIT",
-  "homepage": "https://github.com/MustaphaSteph/agent-bus",
-  "publisher": {
+  "description": "Local message bus for agent-to-agent communication across Claude/Codex/Cursor sessions on the same machine. Adds the agent-bus MCP server (20 tools) and the universal coordinator skill. Optional Stop hook for listener resilience (off by default).",
+  "author": {
     "name": "Mustapha Achtaou",
     "url": "https://github.com/MustaphaSteph"
   },
-  "skills": ["./skills"],
-  "mcpServers": "./.mcp.json",
+  "homepage": "https://github.com/MustaphaSteph/agent-bus",
+  "repository": "https://github.com/MustaphaSteph/agent-bus-plugins",
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "multi-agent",
+    "agent-orchestration",
+    "agent-to-agent",
+    "sqlite",
+    "local-first"
+  ],
+  "skills": "./skills/",
   "hooks": "./hooks/hooks.json",
-  "requires": {
-    "node": ">=20",
-    "binaries": ["agent-bus-mcp"]
-  },
-  "install": {
-    "note": "This plugin requires the @agent-bus-connect/cli npm package to be installed globally. Install with: npm i -g @agent-bus-connect/cli"
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "agent-bus",
+    "shortDescription": "Talk between Claude/Codex/Cursor sessions",
+    "longDescription": "Coordinate work across multiple AI agent sessions on the same machine via a local SQLite-backed message bus. Register session names, delegate to helpers, get a second opinion, ask specialists by capability, broadcast to channels, and track shared tasks. Requires @agent-bus-connect/cli on PATH.",
+    "developerName": "Mustapha Achtaou",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/MustaphaSteph/agent-bus",
+    "defaultPrompt": [
+      "Register me on agent-bus and show who else is around.",
+      "Ask a reviewer to check my latest changes.",
+      "Delegate this to a helper and notify me when done."
+    ]
   }
 }

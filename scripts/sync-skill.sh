@@ -16,7 +16,7 @@
 
 set -e
 
-DEFAULT_PINNED_TAG="v0.4.0"
+DEFAULT_PINNED_TAG="v0.4.1"
 DEFAULT_REPO_URL="https://github.com/MustaphaSteph/agent-bus.git"
 SKILL_SUBPATH="skills/agent-bus"
 PLUGIN_SKILL_DIR="plugins/agent-bus/skills/agent-bus"

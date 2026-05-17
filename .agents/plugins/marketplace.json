@@ -1,31 +1,20 @@
 {
-  "$schema": "https://developers.openai.com/codex/schemas/marketplace.json",
   "name": "agent-bus-plugins",
-  "displayName": "agent-bus",
-  "version": "0.4.0",
-  "description": "Coordinate work across multiple AI agent sessions on the same machine via a local message bus. Bundles the agent-bus MCP server, the universal coordinator skill, and an optional Stop hook for listener resilience.",
-  "homepage": "https://github.com/MustaphaSteph/agent-bus",
-  "publisher": {
-    "name": "Mustapha Achtaou",
-    "url": "https://github.com/MustaphaSteph"
+  "interface": {
+    "displayName": "agent-bus"
   },
-  "license": "MIT",
   "plugins": [
     {
       "name": "agent-bus",
-      "path": "./plugins/agent-bus",
-      "version": "0.4.0",
-      "description": "Local message bus for agent-to-agent communication. Register a name, delegate to helpers, get a second opinion, ask specialists by capability, broadcast to channels, and track shared tasks — all through one SQLite file. Requires the @agent-bus-connect/cli npm package to be installed.",
-      "categories": ["agents", "collaboration", "mcp", "productivity"],
-      "tags": [
-        "mcp",
-        "model-context-protocol",
-        "multi-agent",
-        "agent-orchestration",
-        "agent-to-agent",
-        "sqlite",
-        "local-first"
-      ]
+      "source": {
+        "source": "local",
+        "path": "./plugins/agent-bus"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
     }
   ]
 }

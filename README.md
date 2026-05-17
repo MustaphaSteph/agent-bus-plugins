@@ -38,18 +38,27 @@ Then re-install or reload the plugin. Without the hook, listener mode still work
 
 ## Install in Claude Code
 
-```
-/plugin
-> Marketplaces
-> Add MustaphaSteph/agent-bus-plugins
-> Install agent-bus
-```
-
-The Claude Code plugin lives under `claude-code/` and ships:
+**Coming in Phase 3.** The Claude Code plugin (under `claude-code/`) is not in this release yet. It will bundle:
 
 - `/main <name>` slash command — primes a coordinator session to talk to the bus in natural language.
 - `/listen <name>` slash command — turns a session into a passive helper.
-- Always-on Stop hook for listener resilience (Claude Code doesn't gate plugin hooks).
+- Always-on Stop hook for listener resilience (Claude Code doesn't gate plugin hooks the way Codex does).
+
+In the meantime, Claude Code users can install the bus manually:
+
+```bash
+npm i -g @agent-bus-connect/cli
+claude mcp add -s user agent-bus -- agent-bus-mcp
+```
+
+And drop the universal skill in place:
+
+```bash
+mkdir -p ~/.claude/skills
+cp -R plugins/agent-bus/skills/agent-bus ~/.claude/skills/
+```
+
+(Or use the upstream skill directly from <https://github.com/MustaphaSteph/agent-bus/tree/main/skills/agent-bus>.)
 
 ## Verify
 
@@ -80,11 +89,13 @@ That validates Node ≥ 20, `agent-bus-mcp` on PATH, and that the installed CLI 
 │   ├── .mcp.json                       (command: agent-bus-mcp)
 │   ├── hooks/hooks.json                (disabled by default)
 │   └── skills/agent-bus/               (vendored from main repo)
-├── claude-code/                       ← Claude Code marketplace + plugin (Phase 3)
 ├── scripts/sync-skill.sh              ← vendor skill from main repo
 ├── .sync-version                       ← what tag/commit the vendored skill came from
 ├── package.json
-└── install.sh                         ← universal fallback (Phase 4)
+│
+│   # Coming in later phases:
+├── claude-code/                       ← Claude Code marketplace + plugin (Phase 3)
+└── install.sh                         ← universal fallback for tools without plugin systems (Phase 4)
 ```
 
 ## Versioning
