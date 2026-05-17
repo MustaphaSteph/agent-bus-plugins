@@ -47,7 +47,7 @@ else
   trap 'rm -rf "$TMP_DIR"' EXIT INT HUP TERM
   mkdir -p "$TMP_DIR"
   printf "Fetching agent-bus@%s from %s ...\n" "$TAG" "$REPO_URL"
-  git clone --depth 1 --branch "$TAG" --quiet "$REPO_URL" "$TMP_DIR/agent-bus" >/dev/null
+  git -c advice.detachedHead=false clone --depth 1 --branch "$TAG" --quiet "$REPO_URL" "$TMP_DIR/agent-bus" >/dev/null
   SOURCE_LABEL="tag:$TAG"
   SOURCE_REF="$(cd "$TMP_DIR/agent-bus" && git rev-parse --short HEAD)"
   SOURCE_DIRTY=""
