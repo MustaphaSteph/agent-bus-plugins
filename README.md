@@ -36,6 +36,25 @@ plugin_hooks = true
 
 Then re-install or reload the plugin. Without the hook, listener mode still works via the long-blocking `inbox(wait_s=110)` call alone — the hook is purely a recovery path for sessions that fall out of the loop.
 
+## Install in Cursor / Gemini CLI / Goose / OpenCode / Junie / Amp / Kiro / others
+
+If your tool supports the open [Agent Skills](https://agentskills.io) format but doesn't have a plugin marketplace, use the universal installer:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/MustaphaSteph/agent-bus-plugins/main/install.sh | sh
+```
+
+It auto-detects every supported tool's config directory under `$HOME` and drops the canonical `agent-bus` skill into each one's `skills/` folder. Then prints the per-tool MCP-server registration hints so you can finish wiring up the bus.
+
+Options:
+
+```bash
+./install.sh --dry-run                    # show plan, change nothing
+./install.sh --target ~/.cursor/skills    # force a specific destination
+```
+
+The skill needs the bus binary too. Install once: `npm i -g @agent-bus-connect/cli`.
+
 ## Install in Claude Code
 
 ```
@@ -91,12 +110,10 @@ That validates Node ≥ 20, `agent-bus-mcp` on PATH, and that the installed CLI 
 │   ├── hooks/hooks.json
 │   ├── hooks-handlers/stop-hook.sh
 │   └── skills/agent-bus/              (vendored, same content as Codex copy)
+├── install.sh                         ← universal fallback for skills-aware tools
 ├── scripts/sync-skill.sh              ← vendors skill into BOTH plugin paths
 ├── .sync-version                       ← what tag/commit the vendored skill came from
-├── package.json
-│
-│   # Coming in later phases:
-└── install.sh                         ← universal fallback for tools without plugin systems (Phase 4)
+└── package.json
 ```
 
 ## Versioning
