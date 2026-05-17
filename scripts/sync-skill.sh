@@ -19,7 +19,10 @@ set -e
 DEFAULT_PINNED_TAG="v0.4.1"
 DEFAULT_REPO_URL="https://github.com/MustaphaSteph/agent-bus.git"
 SKILL_SUBPATH="skills/agent-bus"
-PLUGIN_SKILL_DIR="plugins/agent-bus/skills/agent-bus"
+
+# Vendored copies live in BOTH the Codex plugin and the Claude Code plugin.
+# Both must match the source; sync writes/checks both.
+PLUGIN_SKILL_DIRS="plugins/agent-bus/skills/agent-bus claude-code/plugins/agent-bus/skills/agent-bus"
 
 CHECK_MODE=0
 if [ "${1:-}" = "--check" ]; then
@@ -59,30 +62,36 @@ if [ ! -f "$SOURCE_PATH/SKILL.md" ]; then
   exit 2
 fi
 
-# ---- 2. Check mode: diff source vs vendored ----
+# ---- 2. Check mode: diff source vs each vendored copy ----
 
 if [ "$CHECK_MODE" = "1" ]; then
-  if [ ! -d "$PLUGIN_SKILL_DIR" ]; then
-    printf "DRIFT: vendored skill missing at %s\n" "$PLUGIN_SKILL_DIR" >&2
-    exit 1
-  fi
-  if ! diff -r -q "$SOURCE_PATH" "$PLUGIN_SKILL_DIR" >/dev/null 2>&1; then
-    printf "DRIFT: vendored skill differs from %s\n" "$SOURCE_LABEL" >&2
-    diff -r "$SOURCE_PATH" "$PLUGIN_SKILL_DIR" >&2 || true
-    exit 1
-  fi
-  printf "OK: vendored skill matches %s (%s)\n" "$SOURCE_LABEL" "$SOURCE_REF"
-  exit 0
+  ANY_DRIFT=0
+  for D in $PLUGIN_SKILL_DIRS; do
+    if [ ! -d "$D" ]; then
+      printf "DRIFT: vendored skill missing at %s\n" "$D" >&2
+      ANY_DRIFT=1
+      continue
+    fi
+    if ! diff -r -q "$SOURCE_PATH" "$D" >/dev/null 2>&1; then
+      printf "DRIFT: vendored skill at %s differs from %s\n" "$D" "$SOURCE_LABEL" >&2
+      diff -r "$SOURCE_PATH" "$D" >&2 || true
+      ANY_DRIFT=1
+      continue
+    fi
+    printf "OK: %s matches %s (%s)\n" "$D" "$SOURCE_LABEL" "$SOURCE_REF"
+  done
+  [ "$ANY_DRIFT" = "0" ] && exit 0 || exit 1
 fi
 
-# ---- 3. Sync ----
+# ---- 3. Sync into every vendored copy ----
 
-rm -rf "$PLUGIN_SKILL_DIR"
-mkdir -p "$(dirname "$PLUGIN_SKILL_DIR")"
-cp -R "$SOURCE_PATH" "$PLUGIN_SKILL_DIR"
-
-# Re-apply executable bit on scripts the tar/cp may have dropped
-find "$PLUGIN_SKILL_DIR/scripts" -type f -name "*.sh" -exec chmod +x {} \;
+for D in $PLUGIN_SKILL_DIRS; do
+  rm -rf "$D"
+  mkdir -p "$(dirname "$D")"
+  cp -R "$SOURCE_PATH" "$D"
+  # Re-apply executable bit on scripts the cp may have dropped
+  find "$D/scripts" -type f -name "*.sh" -exec chmod +x {} \;
+done
 
 # ---- 4. Write .sync-version ----
 

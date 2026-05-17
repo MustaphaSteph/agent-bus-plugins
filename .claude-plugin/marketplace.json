@@ -1,0 +1,25 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "agent-bus-plugins",
+  "description": "Local message bus for AI agent-to-agent communication. Bundles the agent-bus MCP server (20 tools), the universal coordinator skill, /main and /listen slash commands, and a Stop hook for listener resilience.",
+  "owner": {
+    "name": "Mustapha Achtaou",
+    "email": "mustapha.achtaou@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "agent-bus",
+      "description": "Coordinate work across multiple Claude/Codex/Cursor sessions on the same machine via a local SQLite-backed message bus. Register a name, delegate to helpers, get a second opinion, ask specialists by capability, broadcast to channels, and track shared tasks. Requires @agent-bus-connect/cli on PATH.",
+      "author": {
+        "name": "Mustapha Achtaou"
+      },
+      "category": "productivity",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/MustaphaSteph/agent-bus-plugins.git",
+        "path": "claude-code/plugins/agent-bus"
+      },
+      "homepage": "https://github.com/MustaphaSteph/agent-bus"
+    }
+  ]
+}

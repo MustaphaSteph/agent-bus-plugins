@@ -1,0 +1,15 @@
+{
+  "description": "Stop hook that auto-resumes agent-bus listener mode if a session falls out of its inbox loop. Safe no-op for sessions that aren't in listener mode.",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks-handlers/stop-hook.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}
