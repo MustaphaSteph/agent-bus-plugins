@@ -20,7 +20,11 @@ The plugin uses the `@agent-bus-connect/cli` npm package for the MCP binary. Ins
 npm i -g @agent-bus-connect/cli
 ```
 
-If you skip this, every bus tool call will fail until you install. The plugin's own skill prints a clear setup-check error in that case.
+If you skip this, every bus tool call will fail until you install. The plugin's own skill prints a clear setup-check error in that case. It can also install or upgrade the CLI when explicitly run with:
+
+```bash
+~/.claude/skills/agent-bus/scripts/check-setup.sh --install-cli
+```
 
 ## Try it after install
 

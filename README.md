@@ -23,7 +23,7 @@ Install the bus binary once per machine:
 npm i -g @agent-bus-connect/cli
 ```
 
-That puts `agent-bus` (CLI) and `agent-bus-mcp` (MCP stdio server) on your PATH. Plugins below assume both are available.
+That puts `agent-bus` (CLI) and `agent-bus-mcp` (MCP stdio server) on your PATH. Plugins below verify both are available through the bundled setup checker. They do not silently install npm packages; run the checker or installer with `--install-cli` when you want it to fix a missing or old CLI.
 
 ## Install in Codex (CLI + Desktop)
 
@@ -61,9 +61,10 @@ Options:
 ```bash
 ./install.sh --dry-run                    # show plan, change nothing
 ./install.sh --target ~/.cursor/skills    # force a specific destination
+./install.sh --install-cli                 # also install/upgrade the npm CLI
 ```
 
-The skill needs the bus binary too. Install once: `npm i -g @agent-bus-connect/cli`.
+The skill needs the bus binary too. Install once with `npm i -g @agent-bus-connect/cli`, or pass `--install-cli` to this installer.
 
 ## Install in Claude Code
 
@@ -102,6 +103,12 @@ If something's off, run the skill's setup checker:
 ```
 
 That validates Node ≥ 20, `agent-bus-mcp` on PATH, and that the installed CLI version satisfies the skill's `requires` field.
+To install/upgrade the CLI from the checker explicitly:
+
+```bash
+~/.claude/skills/agent-bus/scripts/check-setup.sh --install-cli
+~/.codex/skills/agent-bus/scripts/check-setup.sh --install-cli
+```
 
 ## Repo layout
 
@@ -145,6 +152,7 @@ For local dev iteration without tagging, use `npm run sync-skill:dev` (reads fro
 | Symptom | Fix |
 |---|---|
 | `agent-bus-mcp: command not found` after plugin install | Run `npm i -g @agent-bus-connect/cli` first. The plugin requires the bus binary to already be on PATH. |
+| Setup checker says CLI is missing or old | Run `<skills-dir>/agent-bus/scripts/check-setup.sh --install-cli` to install/upgrade via npm. |
 | Skill installed but tools not visible | Open a NEW session — Claude Code / Codex read MCP config at session start. |
 | Codex Stop hook doesn't trigger | Check `[features].plugin_hooks = true` in `~/.codex/config.toml` and reload the plugin. Without that flag, plugin-bundled hooks are inert in Codex. |
 | Setup check exit non-zero | Read the printed install hint; the script's exit message tells you exactly what's missing. |

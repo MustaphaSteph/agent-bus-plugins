@@ -4,9 +4,9 @@
 # For agent clients that support the Agent Skills format but don't have a
 # plugin marketplace (Cursor, Gemini CLI, Goose, OpenCode, Junie, Amp,
 # Kiro, fast-agent, …), this script drops the canonical `agent-bus`
-# skill into each tool's skills directory it can detect. It does NOT
-# install the MCP server itself — that's a separate npm step, which the
-# script prints at the end.
+# skill into each tool's skills directory it can detect. By default it
+# only verifies whether the CLI is present and prints the npm command.
+# Pass --install-cli to install/upgrade the MCP server CLI via npm.
 #
 # Usage:
 #
@@ -17,6 +17,7 @@
 #   ./install.sh                         # detect every supported tool, install to each
 #   ./install.sh --target ~/.cursor/skills  # force a specific destination
 #   ./install.sh --dry-run               # print plan, change nothing
+#   ./install.sh --install-cli           # also run npm i -g @agent-bus-connect/cli@latest
 #
 # Exit codes:
 #   0 — installed somewhere (or dry-run completed)
@@ -28,11 +29,16 @@ set -e
 # ---- args ----
 
 DRY_RUN=0
+INSTALL_CLI=0
 EXPLICIT_TARGET=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --dry-run|-n)
       DRY_RUN=1
+      shift
+      ;;
+    --install|--install-cli)
+      INSTALL_CLI=1
       shift
       ;;
     --target)
@@ -58,6 +64,16 @@ while [ $# -gt 0 ]; do
       ;;
   esac
 done
+
+install_cli() {
+  if ! command -v npm >/dev/null 2>&1; then
+    printf "ERROR: npm is not on PATH; cannot install @agent-bus-connect/cli automatically\n" >&2
+    exit 2
+  fi
+  printf "\nInstalling/upgrading @agent-bus-connect/cli@latest ...\n"
+  npm i -g @agent-bus-connect/cli@latest
+  hash -r 2>/dev/null || true
+}
 
 # ---- locate the source skill ----
 
@@ -149,6 +165,10 @@ printf "%s\n" "$CANDS" | while IFS=":" read -r LABEL DIR; do
 done
 [ "$DRY_RUN" = "1" ] && { printf "\n(dry-run) no files written.\n"; exit 0; }
 
+if [ "$INSTALL_CLI" = "1" ]; then
+  install_cli
+fi
+
 INSTALLED=0
 printf "\n"
 echo "$CANDS" | while IFS=":" read -r LABEL DIR; do
@@ -170,6 +190,10 @@ Next steps:
 
      npm i -g @agent-bus-connect/cli
 
+   Or rerun this installer with:
+
+     ./install.sh --install-cli
+
 2. Register the agent-bus MCP server in each tool. The exact command
    differs per tool; the most common ones:
 
@@ -190,7 +214,9 @@ Next steps:
    If something's off, run the bundled setup-check script:
      <skills-dir>/agent-bus/scripts/check-setup.sh
 
-   It validates node >= 20, agent-bus-mcp on PATH, and version.
+   It validates node >= 20, agent-bus-mcp on PATH, and version. To let
+   the checker install/upgrade the npm CLI explicitly, run:
+     <skills-dir>/agent-bus/scripts/check-setup.sh --install-cli
 
 For the turn-key plugin install (instead of the manual skill drop):
 
