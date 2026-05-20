@@ -4,7 +4,7 @@
 # ship the same skill body.
 #
 # Two modes:
-#   1. CI / release  (default)       Pull from a pinned tag of MustaphaSteph/agent-bus.
+#   1. CI / release  (default)       Pull from a pinned ref of MustaphaSteph/agent-bus.
 #   2. Local dev     SYNC_SOURCE=… pull from a local clone (faster iteration).
 #
 # Drift gate:
@@ -16,7 +16,7 @@
 
 set -e
 
-DEFAULT_PINNED_TAG="v0.4.1"
+DEFAULT_PINNED_TAG="main"
 DEFAULT_REPO_URL="https://github.com/MustaphaSteph/agent-bus.git"
 SKILL_SUBPATH="skills/agent-bus"
 
@@ -51,7 +51,7 @@ else
   mkdir -p "$TMP_DIR"
   printf "Fetching agent-bus@%s from %s ...\n" "$TAG" "$REPO_URL"
   git -c advice.detachedHead=false clone --depth 1 --branch "$TAG" --quiet "$REPO_URL" "$TMP_DIR/agent-bus" >/dev/null
-  SOURCE_LABEL="tag:$TAG"
+  SOURCE_LABEL="ref:$TAG"
   SOURCE_REF="$(cd "$TMP_DIR/agent-bus" && git rev-parse --short HEAD)"
   SOURCE_DIRTY=""
   SOURCE_PATH="$TMP_DIR/agent-bus/$SKILL_SUBPATH"

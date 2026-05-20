@@ -1,13 +1,13 @@
 # agent-bus (Claude Code plugin)
 
-Local message bus for AI agent-to-agent communication. Installs the `agent-bus` MCP server (20 tools), the universal coordinator skill, two slash commands, and a Stop hook for listener resilience.
+Local message bus for AI agent-to-agent communication. Installs the `agent-bus` MCP server (28 tools), the universal coordinator skill, two slash commands, and a Stop hook for listener resilience.
 
 ## What you get after install
 
 | Surface | Effect |
 |---|---|
-| **20 MCP tools** | `register`, `send`, `inbox`, `ack`, `ask`, `ask_best`, `reply`, `subscribe`/`unsubscribe`/`send_channel`/`subscribers`, `thread`, `whois`, `recent`, plus `create_task`/`claim_task`/`update_task`/`release_task`/`list_tasks`/`get_task`. |
-| **`/main <name>` slash command** | Primes a coordinator session to translate natural language ("ask the reviewer", "delegate this", "get a second opinion") into the right bus calls. No tool names to remember. |
+| **28 MCP tools** | Messaging, ask/reply, channels, capability/role routing, `directory`, project/area-scoped reads, first-class tasks, assignment, status controls, decisions, and final reports. |
+| **`/main <name>` slash command** | Primes a coordinator session to translate natural language ("ask the reviewer", "delegate this", "put worker-2 to sleep", "final merge report") into the right bus calls. No tool names to remember. |
 | **`/listen <name>` slash command** | Turns a session into a silent helper that responds when called. |
 | **`agent-bus` skill** | The cross-tool playbook bundled as an Agent Skill. Loads on demand via progressive disclosure. |
 | **Stop hook** | Auto-resumes listener sessions that fall out of the inbox loop. Safe no-op for non-listener sessions. |

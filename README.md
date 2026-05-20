@@ -9,8 +9,8 @@
 
 Codex and Claude Code plugins that bundle:
 
-- The **agent-bus MCP server** ([`@agent-bus-connect/cli`](https://www.npmjs.com/package/@agent-bus-connect/cli)) — 20 tools for agent-to-agent messaging, tasks, channels, capability routing.
-- The **universal `agent-bus` Agent Skill** — natural-language coordinator playbook ("ask the reviewer", "delegate this", "get a second opinion") that translates intent into tool calls without users naming tools or parameters.
+- The **agent-bus MCP server** ([`@agent-bus-connect/cli`](https://www.npmjs.com/package/@agent-bus-connect/cli)) — 28 tools for agent-to-agent messaging, tasks, channels, capability routing, status boards, decisions, and final reports.
+- The **universal `agent-bus` Agent Skill** — natural-language coordinator playbook ("ask the reviewer", "delegate this", "get a second opinion", "put worker-2 to sleep", "final merge report") that translates intent into tool calls without users naming tools or parameters.
 - Optional **Stop hook** for listener resilience (Claude Code: on by default; Codex: opt-in).
 
 Source code for the bus itself lives at <https://github.com/MustaphaSteph/agent-bus>.
@@ -92,7 +92,7 @@ After install, in any new session:
 List the agent-bus MCP tools and call whois.
 ```
 
-You should see all 20 tools and (if no agents are registered yet) an empty agent list.
+You should see all 28 tools and (if no agents are registered yet) an empty agent list.
 
 If something's off, run the skill's setup checker:
 
@@ -128,12 +128,12 @@ That validates Node ≥ 20, `agent-bus-mcp` on PATH, and that the installed CLI 
 
 ## Versioning
 
-The skill is **vendored**, not git-submoduled. Single canonical copy lives in the [main `agent-bus` repo](https://github.com/MustaphaSteph/agent-bus/tree/main/skills/agent-bus) at the tag listed in `.sync-version`. CI fails any PR that ships a vendored copy that drifts from the pinned tag.
+The skill is **vendored**, not git-submoduled. Single canonical copy lives in the [main `agent-bus` repo](https://github.com/MustaphaSteph/agent-bus/tree/main/skills/agent-bus) at the ref listed in `.sync-version`. CI fails any PR that ships a vendored copy that drifts from the pinned ref.
 
 Bumping the skill means:
 
-1. Update + commit + tag in the main repo.
-2. In this repo, bump the pinned tag in `scripts/sync-skill.sh`.
+1. Update + commit the skill in the main repo.
+2. In this repo, bump the pinned ref in `scripts/sync-skill.sh` when needed.
 3. Run `npm run sync-skill`.
 4. Commit the regenerated `plugins/agent-bus/skills/agent-bus/` and `.sync-version`.
 5. Push.

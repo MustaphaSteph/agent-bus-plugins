@@ -63,7 +63,7 @@ when the agent-bus-plugins repo has its first proper release tag.
 **Entry (per the existing awesome-list pattern):**
 
 ```markdown
-- **[MustaphaSteph/agent-bus-plugins](https://github.com/MustaphaSteph/agent-bus-plugins)** — Local message bus plugin: bundles agent-bus MCP server (20 tools), coordinator skill, Stop hook for listener resilience. `codex plugin marketplace add MustaphaSteph/agent-bus-plugins`
+- **[MustaphaSteph/agent-bus-plugins](https://github.com/MustaphaSteph/agent-bus-plugins)** — Local message bus plugin: bundles agent-bus MCP server (28 tools), coordinator skill, Stop hook for listener resilience. `codex plugin marketplace add MustaphaSteph/agent-bus-plugins`
 ```
 
 ---
@@ -80,7 +80,7 @@ via a PR but adoption + quality bar is high. Realistic milestone:
 ```json
 {
   "name": "agent-bus",
-  "description": "Local message bus for AI agent-to-agent communication. 20 MCP tools across messaging, channels, capability routing, conversation threads, and first-class tasks. Lets multiple Claude Code, Codex, and Cursor sessions on the same machine collaborate via a single SQLite file. Ships the universal `agent-bus` Agent Skill plus /main and /listen slash commands.",
+    "description": "Local message bus for AI agent-to-agent communication. 28 MCP tools across messaging, channels, capability routing, conversation threads, first-class tasks, status boards, decisions, and final reports. Lets multiple Claude Code, Codex, and Cursor sessions on the same machine collaborate via a single SQLite file. Ships the universal `agent-bus` Agent Skill plus /main and /listen slash commands.",
   "author": {
     "name": "Mustapha Achtaou"
   },
@@ -98,7 +98,7 @@ via a PR but adoption + quality bar is high. Realistic milestone:
 
 Pre-PR checklist for this one:
 
-- [ ] Cut a real release tag on `agent-bus-plugins` (e.g. `v0.4.0`)
+- [ ] Cut a real release tag on `agent-bus-plugins` (e.g. `v0.5.0`)
 - [ ] Fill in `ref` and `sha`
 - [ ] Working demo video or animated GIF in the agent-bus-plugins README
 - [ ] Stars / install metrics proving usage
@@ -120,7 +120,7 @@ their radar.
 > local message bus for AI agent-to-agent coordination across Claude
 > Code, Codex, Cursor, and other MCP-aware tools. It ships:
 >
-> - An MCP server (`@agent-bus-connect/cli` on npm, 20 tools)
+> - An MCP server (`@agent-bus-connect/cli` on npm, 28 tools)
 > - A universal `agent-bus` Agent Skill that translates natural
 >   language ("ask the reviewer", "delegate this") into the right
 >   tool calls

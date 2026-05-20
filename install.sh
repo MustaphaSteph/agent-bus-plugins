@@ -84,8 +84,8 @@ elif [ -d "$SCRIPT_DIR/claude-code/plugins/agent-bus/skills/agent-bus" ]; then
 else
   # curl-piped invocation — fetch the skill from GitHub.
   TMP_SKILL="$(mktemp -d 2>/dev/null || mktemp -d -t agent-bus-skill)"
-  TARBALL_URL="https://github.com/MustaphaSteph/agent-bus/archive/refs/tags/v0.4.1.tar.gz"
-  printf "Fetching agent-bus skill v0.4.1 ...\n"
+  TARBALL_URL="https://github.com/MustaphaSteph/agent-bus/archive/refs/heads/main.tar.gz"
+  printf "Fetching latest agent-bus skill ...\n"
   if command -v curl >/dev/null 2>&1; then
     curl -fsSL "$TARBALL_URL" -o "$TMP_SKILL/agent-bus.tar.gz"
   elif command -v wget >/dev/null 2>&1; then
