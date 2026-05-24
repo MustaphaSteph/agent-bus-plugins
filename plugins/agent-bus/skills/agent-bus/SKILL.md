@@ -2,7 +2,7 @@
 name: agent-bus
 description: Coordinate work across Claude/Codex/Cursor sessions on the same machine via a local message bus. Use to delegate to helpers, get a second opinion, ask specialists by capability, or track shared tasks.
 requires:
-  - agent-bus-mcp >= 0.9.0
+  - agent-bus-mcp >= 0.10.0
 ---
 
 # agent-bus
@@ -186,6 +186,15 @@ The manager should create tasks with `mode`, `expected_output`, and
 `file_scope`; frontend/backend workers should only edit within
 `file_scope`; the verifier should use `test_only` and avoid
 implementation edits.
+
+For repeated iOS app folders, use `agent-bus team init-ios-app
+--project <unique-project> --api <api-name>` inside each new app
+subfolder. This creates a separated-folder project scope with
+`area="ios"` and prints a Codex/Claude team prompt. A strong iOS app
+team is Codex PM/integrator, two Claude UI researchers, one Claude UI
+executor using FlowDeck, one core/API worker, and one verifier in
+`test_only` mode. The two UI researchers should discuss and merge design
+ideas before the UI executor edits files.
 
 ## Hard rules
 
