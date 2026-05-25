@@ -3,7 +3,7 @@
     "agent-bus": {
       "command": "agent-bus-mcp",
       "args": [],
-      "description": "Local message bus for agent-to-agent communication. Provides 28 tools across messaging, channels, capability routing, conversation threads, first-class tasks, status boards, decisions, and final reports."
+      "description": "Local message bus for agent-to-agent communication. Provides 47 tools across messaging, channels, capability routing, conversation threads, first-class tasks, status boards, decisions, memories, session briefs, review gates, and final reports."
     }
   }
 }
