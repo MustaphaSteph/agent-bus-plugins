@@ -1,7 +1,7 @@
 {
   "name": "agent-bus",
-  "version": "0.11.0",
-  "description": "Local message bus for agent-to-agent communication across Claude/Codex/Cursor sessions on the same machine. Adds the agent-bus MCP server (53 tools) and the universal coordinator skill. Optional Stop hook for listener resilience (off by default).",
+  "version": "0.12.0",
+  "description": "Local message bus for agent-to-agent communication across Claude/Codex/Cursor sessions on the same machine. Adds the agent-bus MCP server (56 tools, including team-scoped send/ask/boards) and the universal coordinator skill. Optional Stop hook for listener resilience (off by default).",
   "author": {
     "name": "Mustapha Achtaou",
     "url": "https://github.com/MustaphaSteph"
@@ -24,7 +24,7 @@
   "interface": {
     "displayName": "agent-bus",
     "shortDescription": "Talk between Claude/Codex/Cursor sessions",
-    "longDescription": "Coordinate work across multiple AI agent sessions on the same machine via a local SQLite-backed message bus. Register session names, delegate to helpers, get a second opinion, ask specialists by capability, broadcast to channels, track shared tasks, record task progress, set agent status, record decisions, and generate review gates/final reports. Requires @agent-bus-connect/cli on PATH.",
+    "longDescription": "Coordinate work across multiple AI agent sessions on the same machine via a local SQLite-backed message bus. Register session names, delegate to helpers, get a second opinion, ask specialists by capability, message scoped teams, broadcast to channels, track shared tasks, record task progress, set agent status, record decisions, and generate review gates/final reports. Requires @agent-bus-connect/cli on PATH.",
     "developerName": "Mustapha Achtaou",
     "category": "Productivity",
     "capabilities": [
