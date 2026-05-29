@@ -15,17 +15,27 @@ Codex and Claude Code plugins that bundle:
 
 Source code for the bus itself lives at <https://github.com/MustaphaSteph/agent-bus>.
 
-## Prerequisites
+## Install Order
 
-Install the bus binary once per machine:
+Install the npm CLI first, then install the plugin. The plugin declares
+the MCP server command, but the `@agent-bus-connect/cli` package
+provides the actual `agent-bus-mcp` binary. Installing the plugin before
+the CLI can produce an `ENOENT` MCP startup error because Claude Code or
+Codex cannot find `agent-bus-mcp`.
+
+### 1. Install the bus binary once per machine
 
 ```bash
-npm i -g @agent-bus-connect/cli
+npm i -g @agent-bus-connect/cli@latest
+which agent-bus-mcp
+agent-bus --version
 ```
 
 That puts `agent-bus` (CLI) and `agent-bus-mcp` (MCP stdio server) on your PATH. Plugins below verify both are available through the bundled setup checker. They do not silently install npm packages; run the checker or installer with `--install-cli` when you want it to fix a missing or old CLI.
 
-## Install in Codex (CLI + Desktop)
+### 2. Choose your host plugin/skill install
+
+#### Codex (CLI + Desktop)
 
 Step 1 — add the marketplace:
 
@@ -46,7 +56,7 @@ plugin_hooks = true
 
 Then re-install or reload the plugin. Without the hook, listener mode still works via the long-blocking `inbox(wait_s=110)` call alone — the hook is purely a recovery path for sessions that fall out of the loop.
 
-## Install in Cursor / Gemini CLI / Goose / OpenCode / Junie / Amp / Kiro / others
+#### Cursor / Gemini CLI / Goose / OpenCode / Junie / Amp / Kiro / others
 
 If your tool supports the open [Agent Skills](https://agentskills.io) format but doesn't have a plugin marketplace, use the universal installer:
 
@@ -64,9 +74,11 @@ Options:
 ./install.sh --install-cli                 # also install/upgrade the npm CLI
 ```
 
-The skill needs the bus binary too. Install once with `npm i -g @agent-bus-connect/cli`, or pass `--install-cli` to this installer.
+The skill needs the bus binary too. Install once with
+`npm i -g @agent-bus-connect/cli@latest`, or pass `--install-cli` to
+this installer.
 
-## Install in Claude Code
+#### Claude Code
 
 ```
 /plugin
@@ -77,9 +89,9 @@ The skill needs the bus binary too. Install once with `npm i -g @agent-bus-conne
 
 The marketplace manifest lives at `.claude-plugin/marketplace.json` at the repo root, so the bare `owner/repo` form works without flags.
 
-The plugin bundles:
+The plugin includes:
 
-- The agent-bus MCP server (declared via the `@agent-bus-connect/cli` npm binary — install it once with `npm i -g @agent-bus-connect/cli`)
+- The agent-bus MCP server config (the actual `agent-bus-mcp` binary comes from the CLI package installed in step 1)
 - The `agent-bus` skill (cross-tool coordinator playbook)
 - `/main <name>` slash command — primes a coordinator session to talk to the bus in natural language
 - `/listen <name>` slash command — turns a session into a passive helper that responds when called
