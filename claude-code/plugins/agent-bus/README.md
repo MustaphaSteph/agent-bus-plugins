@@ -1,12 +1,12 @@
 # agent-bus (Claude Code plugin)
 
-Local message bus for AI agent-to-agent communication. Installs the `agent-bus` MCP server (56 tools, including team-scoped send/ask/boards), the universal coordinator skill, two slash commands, and a Stop hook for listener resilience.
+Local message bus for AI agent-to-agent communication. Installs the `agent-bus` MCP server (57 tools, including team-scoped send/ask/delegation/boards), the universal coordinator skill, two slash commands, and a Stop hook for listener resilience.
 
 ## What you get after install
 
 | Surface | Effect |
 |---|---|
-| **56 MCP tools** | Messaging, ask/reply, team-scoped send/ask/boards, channels, capability/role routing, `directory`, project/area-scoped reads, first-class tasks, assignment, acknowledgements, task progress events, task result bundles, cancellation, review gates, handoffs, scope checks, status controls, decisions, memories, session briefs, and final reports. |
+| **57 MCP tools** | Messaging, ask/reply, team-scoped send/ask/delegation/boards, channels, capability/role routing, `directory`, project/area-scoped reads, first-class tasks, assignment, acknowledgements, task progress events, task result bundles, cancellation, review gates, handoffs, scope checks, status controls, decisions, memories, session briefs, and final reports. |
 | **`/main <name>` slash command** | Primes a coordinator session to translate natural language ("ask the reviewer", "delegate this", "put worker-2 to sleep", "final merge report") into the right bus calls. No tool names to remember. |
 | **`/listen <name>` slash command** | Turns a session into a silent helper that responds when called. |
 | **`agent-bus` skill** | The cross-tool playbook bundled as an Agent Skill. Loads on demand via progressive disclosure. |

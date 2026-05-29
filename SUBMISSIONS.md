@@ -63,7 +63,7 @@ when the agent-bus-plugins repo has its first proper release tag.
 **Entry (per the existing awesome-list pattern):**
 
 ```markdown
-- **[MustaphaSteph/agent-bus-plugins](https://github.com/MustaphaSteph/agent-bus-plugins)** — Local message bus plugin: bundles agent-bus MCP server (56 tools), coordinator skill, Stop hook for listener resilience. `codex plugin marketplace add MustaphaSteph/agent-bus-plugins`
+- **[MustaphaSteph/agent-bus-plugins](https://github.com/MustaphaSteph/agent-bus-plugins)** — Local message bus plugin: bundles agent-bus MCP server (57 tools), coordinator skill, Stop hook for listener resilience. `codex plugin marketplace add MustaphaSteph/agent-bus-plugins`
 ```
 
 ---
@@ -80,7 +80,7 @@ via a PR but adoption + quality bar is high. Realistic milestone:
 ```json
 {
   "name": "agent-bus",
-    "description": "Local message bus for AI agent-to-agent communication. 56 MCP tools across messaging, team-scoped send/ask/boards, channels, capability routing, conversation threads, first-class tasks, task events, result bundles, cancellation, status boards, decisions, memories, session briefs, review gates, and final reports. Lets multiple Claude Code, Codex, and Cursor sessions on the same machine collaborate via a single SQLite file. Ships the universal `agent-bus` Agent Skill plus /main and /listen slash commands.",
+    "description": "Local message bus for AI agent-to-agent communication. 57 MCP tools across messaging, team-scoped send/ask/delegation/boards, channels, capability routing, conversation threads, first-class tasks, task events, result bundles, cancellation, status boards, decisions, memories, session briefs, review gates, and final reports. Lets multiple Claude Code, Codex, and Cursor sessions on the same machine collaborate via a single SQLite file. Ships the universal `agent-bus` Agent Skill plus /main and /listen slash commands.",
   "author": {
     "name": "Mustapha Achtaou"
   },
@@ -120,7 +120,7 @@ their radar.
 > local message bus for AI agent-to-agent coordination across Claude
 > Code, Codex, Cursor, and other MCP-aware tools. It ships:
 >
-> - An MCP server (`@agent-bus-connect/cli` on npm, 56 tools)
+> - An MCP server (`@agent-bus-connect/cli` on npm, 57 tools)
 > - A universal `agent-bus` Agent Skill that translates natural
 >   language ("ask the reviewer", "delegate this") into the right
 >   tool calls
