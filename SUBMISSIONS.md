@@ -98,7 +98,7 @@ via a PR but adoption + quality bar is high. Realistic milestone:
 
 Pre-PR checklist for this one:
 
-- [ ] Cut a real release tag on `agent-bus-plugins` (e.g. `v0.12.1`)
+- [ ] Cut a real release tag on `agent-bus-plugins` (e.g. `v0.13.0`)
 - [ ] Fill in `ref` and `sha`
 - [ ] Working demo video or animated GIF in the agent-bus-plugins README
 - [ ] Stars / install metrics proving usage
