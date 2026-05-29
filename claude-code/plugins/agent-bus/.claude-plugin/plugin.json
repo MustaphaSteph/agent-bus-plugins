@@ -1,6 +1,6 @@
 {
   "name": "agent-bus",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "Local message bus for AI agent-to-agent communication. Adds 56 MCP tools, including team-scoped send/ask/boards, the agent-bus coordinator skill, /main and /listen slash commands, and a Stop hook for listener resilience.",
   "author": {
     "name": "Mustapha Achtaou",
