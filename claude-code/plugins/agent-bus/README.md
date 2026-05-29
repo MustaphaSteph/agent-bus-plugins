@@ -20,11 +20,20 @@ The plugin uses the `@agent-bus-connect/cli` npm package for the MCP binary. Ins
 npm i -g @agent-bus-connect/cli
 ```
 
-If you skip this, every bus tool call will fail until you install. The plugin's own skill prints a clear setup-check error in that case. It can also install or upgrade the CLI when explicitly run with:
+If you skip this, Claude Code may show an `ENOENT` MCP startup error
+because it cannot find `agent-bus-mcp`. Install the package, verify
+`which agent-bus-mcp`, then reconnect `/mcp` or restart Claude Code.
+The plugin's own skill also prints a setup-check error in that case. It
+can install or upgrade the CLI when explicitly run with:
 
 ```bash
 ~/.claude/skills/agent-bus/scripts/check-setup.sh --install-cli
 ```
+
+If the setup checker still says the installed CLI is older than
+required after installing `latest`, the plugin was released ahead of the
+npm package. Check `npm view @agent-bus-connect/cli version`; publish
+the required CLI version before releasing the plugin.
 
 ## Try it after install
 

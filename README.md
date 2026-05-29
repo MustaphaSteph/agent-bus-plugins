@@ -151,8 +151,9 @@ For local dev iteration without tagging, use `npm run sync-skill:dev` (reads fro
 
 | Symptom | Fix |
 |---|---|
-| `agent-bus-mcp: command not found` after plugin install | Run `npm i -g @agent-bus-connect/cli` first. The plugin requires the bus binary to already be on PATH. |
+| `ENOENT` or `agent-bus-mcp: command not found` after plugin install | Run `npm i -g @agent-bus-connect/cli@latest`, verify `which agent-bus-mcp`, then reconnect `/mcp` or restart the host app. The plugin declares the MCP command, but the npm package provides the actual binary. |
 | Setup checker says CLI is missing or old | Run `<skills-dir>/agent-bus/scripts/check-setup.sh --install-cli` to install/upgrade via npm. |
+| Setup checker still says `agent-bus X is older than required Y` after installing latest | The plugin/skill is ahead of the published npm CLI. Check `npm view @agent-bus-connect/cli version`; publish the required CLI version first, or lower `MIN_AGENT_BUS` to the latest published version before releasing the plugin. |
 | Skill installed but tools not visible | Open a NEW session — Claude Code / Codex read MCP config at session start. |
 | Codex Stop hook doesn't trigger | Check `[features].plugin_hooks = true` in `~/.codex/config.toml` and reload the plugin. Without that flag, plugin-bundled hooks are inert in Codex. |
 | Setup check exit non-zero | Read the printed install hint; the script's exit message tells you exactly what's missing. |
