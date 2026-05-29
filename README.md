@@ -9,7 +9,7 @@
 
 Codex and Claude Code plugins that bundle:
 
-- The **agent-bus MCP server** ([`@agent-bus-connect/cli`](https://www.npmjs.com/package/@agent-bus-connect/cli)) — 57 tools for agent-to-agent messaging, team-scoped send/ask/delegation/boards, tasks, task progress events, result bundles, cancellation, channels, capability routing, status boards, acknowledgements, review gates, handoffs, scope checks, decisions, memories, session briefs, and final reports.
+- The **agent-bus MCP server** ([`@agent-bus-connect/cli`](https://www.npmjs.com/package/@agent-bus-connect/cli)) — 57 tools for agent-to-agent messaging, team-scoped send/ask/delegation/boards, workflow Kanban, tasks, task progress events, result bundles, cancellation, channels, capability routing, status boards, acknowledgements, review gates, handoffs, scope checks, decisions, memories, session briefs, and final reports.
 - The **universal `agent-bus` Agent Skill** — natural-language coordinator playbook ("ask the reviewer", "delegate this", "get a second opinion", "put worker-2 to sleep", "final merge report") that translates intent into tool calls without users naming tools or parameters.
 - Optional **Stop hook** for listener resilience (Claude Code: on by default; Codex: opt-in).
 

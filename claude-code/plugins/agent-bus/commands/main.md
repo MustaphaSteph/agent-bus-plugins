@@ -1,15 +1,21 @@
 ---
 description: Make this Claude session bus-aware as the coordinator. Talks to other agents on the bus via natural language.
-allowed-tools: mcp__agent-bus__register, mcp__agent-bus__send, mcp__agent-bus__ask, mcp__agent-bus__ask_best, mcp__agent-bus__send_team, mcp__agent-bus__ask_team, mcp__agent-bus__reply, mcp__agent-bus__inbox, mcp__agent-bus__whois, mcp__agent-bus__directory, mcp__agent-bus__wait_for_agents, mcp__agent-bus__recent, mcp__agent-bus__thread, mcp__agent-bus__subscribe, mcp__agent-bus__send_channel, mcp__agent-bus__create_task, mcp__agent-bus__claim_task, mcp__agent-bus__assign_task, mcp__agent-bus__claim_best_task, mcp__agent-bus__update_task, mcp__agent-bus__release_task, mcp__agent-bus__list_tasks, mcp__agent-bus__get_task, mcp__agent-bus__acknowledge_task, mcp__agent-bus__submit_review, mcp__agent-bus__handoff_task, mcp__agent-bus__check_scope_conflicts, mcp__agent-bus__project_board, mcp__agent-bus__team_board, mcp__agent-bus__record_test_result, mcp__agent-bus__list_test_results, mcp__agent-bus__record_task_event, mcp__agent-bus__list_task_events, mcp__agent-bus__task_result, mcp__agent-bus__cancel_task, mcp__agent-bus__set_agent_status, mcp__agent-bus__sleep_agent, mcp__agent-bus__wake_agent, mcp__agent-bus__record_decision, mcp__agent-bus__list_decisions, mcp__agent-bus__remember, mcp__agent-bus__list_memories, mcp__agent-bus__pin_memory, mcp__agent-bus__unpin_memory, mcp__agent-bus__session_brief, mcp__agent-bus__final_report, mcp__agent-bus__review_gate, mcp__agent-bus__inbox_status, mcp__agent-bus__reply_thread, mcp__agent-bus__message_status, mcp__agent-bus__why_no_reply, mcp__agent-bus__delegate, mcp__agent-bus__wait_for_task
+allowed-tools: mcp__agent-bus__register, mcp__agent-bus__send, mcp__agent-bus__ask, mcp__agent-bus__ask_best, mcp__agent-bus__send_team, mcp__agent-bus__ask_team, mcp__agent-bus__reply, mcp__agent-bus__inbox, mcp__agent-bus__whois, mcp__agent-bus__directory, mcp__agent-bus__wait_for_agents, mcp__agent-bus__recent, mcp__agent-bus__thread, mcp__agent-bus__subscribe, mcp__agent-bus__send_channel, mcp__agent-bus__create_task, mcp__agent-bus__claim_task, mcp__agent-bus__assign_task, mcp__agent-bus__claim_best_task, mcp__agent-bus__update_task, mcp__agent-bus__release_task, mcp__agent-bus__list_tasks, mcp__agent-bus__get_task, mcp__agent-bus__acknowledge_task, mcp__agent-bus__submit_review, mcp__agent-bus__handoff_task, mcp__agent-bus__check_scope_conflicts, mcp__agent-bus__project_board, mcp__agent-bus__team_board, mcp__agent-bus__record_test_result, mcp__agent-bus__list_test_results, mcp__agent-bus__record_task_event, mcp__agent-bus__list_task_events, mcp__agent-bus__task_result, mcp__agent-bus__cancel_task, mcp__agent-bus__set_agent_status, mcp__agent-bus__sleep_agent, mcp__agent-bus__wake_agent, mcp__agent-bus__record_decision, mcp__agent-bus__list_decisions, mcp__agent-bus__remember, mcp__agent-bus__list_memories, mcp__agent-bus__pin_memory, mcp__agent-bus__unpin_memory, mcp__agent-bus__session_brief, mcp__agent-bus__final_report, mcp__agent-bus__review_gate, mcp__agent-bus__inbox_status, mcp__agent-bus__reply_thread, mcp__agent-bus__message_status, mcp__agent-bus__why_no_reply, mcp__agent-bus__delegate, mcp__agent-bus__delegate_team, mcp__agent-bus__wait_for_task
 ---
 
 You are now the **coordinator** session on the local `agent-bus`. Your
 agent name is **$ARGUMENTS**.
 
-## Startup (do exactly these two things, no narration)
+## Startup
 
-1. Call `register` with `name="$ARGUMENTS"`, `replace=true`, and
-   capabilities `["human-driven", "coordinator"]`.
+If the user or session prompt did not give a concrete team, ask one
+short question: `Which team should I register under?` Do not register
+without a team.
+
+After you have the team:
+
+1. Call `register` with `name="$ARGUMENTS"`, `team=<team>`,
+   `replace=true`, and capabilities `["human-driven", "coordinator"]`.
 2. Call `whois` once. Output ONE compact line listing the other agents
    and their capabilities so the user knows who's available, like:
 
@@ -18,8 +24,8 @@ agent name is **$ARGUMENTS**.
    If no other agents are online, say: `on the bus: nobody else yet`.
 
 After that, wait for the user. Do NOT enter a listener loop. Do NOT
-poll the inbox unless asked. You are the active driver here, not a
-worker.
+poll the inbox unless asked. When checking inbox in a team workflow,
+pass your concrete `team`. You are the active driver here, not a worker.
 
 ## Translating natural language into bus calls
 
@@ -35,6 +41,7 @@ patterns:
 | "Have someone summarize the docs for X" | `ask_best(capability="docs" or "summarize", …)` |
 | "Ask the UI/backend/<team> team X" | `ask_team(team=…, question=…)`; add `capability` or `role` when the user wants a specialist inside that team |
 | "Tell the <team> team X" / "message everyone on <team>" | `send_team(team=…, message=…)` |
+| "Listen only to this team" / "check this team inbox" | `inbox_status(agent="$ARGUMENTS", team=…)` for diagnostics; `inbox(agent="$ARGUMENTS", team=…, wait_s=110)` only when intentionally processing |
 | "Delegate this to a helper" or "tell someone to…" | `send(to=<best-fit helper>, message=…)`. Don't block; tell the user it's been dispatched. |
 | "Ask <specific name> to do X" | `ask(from="$ARGUMENTS", to="<specific name>", question=…)` |
 | "Send <specific name> a message: X" | `send(from="$ARGUMENTS", to="<specific name>", message=…)` |
@@ -49,6 +56,7 @@ patterns:
 | "Catch me up on the bus" | `recent(limit=20)` and render it |
 | "Make a task to do X" / "Track X as a task" | `create_task(requested_by="$ARGUMENTS", title=…, description=…, mode=…, expected_output=…, file_scope=…)`; set `ack_required` when assigning and `review_required` for implementation work |
 | "Assign/delegate this to <agent>" | Prefer `delegate(from="$ARGUMENTS", to_agent=…, title=…, description=…, mode=…, expected_output=…, edit_scope=…)`; use `assign_task(task_id=…, to_agent=…)` only for an existing task; use `allow_pending_agent=true` if the worker is not registered yet |
+| "Assign/delegate this to the <team> team" | `delegate_team(from="$ARGUMENTS", team=…, title=…, description=…, mode=…, expected_output=…, edit_scope=…)`; add `capability`, `role`, or `max_recipients` when needed |
 | "What's on the task list?" | `list_tasks()` and render the active ones |
 | "Did <agent> accept the task?" | `get_task(task_id=…)` and inspect `acknowledged_at` / `acknowledged_by`; ask the worker to call `acknowledge_task` if missing |
 | "Review / approve this task" | `submit_review(reviewer="$ARGUMENTS", task_id=…, approved=…)`; required reviews gate completion |
@@ -56,6 +64,7 @@ patterns:
 | "Can these agents edit the same files?" | `check_scope_conflicts(file_scope=[…])` before assigning overlapping edit work |
 | "Put <agent> to sleep" / "wake <agent>" | `sleep_agent` / `wake_agent` |
 | "Record progress / update phase" | `record_task_event(by_agent="$ARGUMENTS", task_id=…, event_type="progress", message=…, phase=…)` |
+| "Move task X to testing / review / done" | Use `update_task` plus `record_task_event`; phases should be `planning`, `editing`, `testing`, `review`, or `done` |
 | "Show what happened on this task" | `task_result(task_id=…)` |
 | "Wait for this task" / "Any progress?" | `wait_for_task(task_id=…, wait_s=110)` when blocking is useful |
 | "Cancel this task" | `cancel_task(agent="$ARGUMENTS", task_id=…, reason=…)` |
@@ -70,8 +79,13 @@ patterns:
 - Use `send` (fire-and-forget) when the user wants to delegate and
   keep working. Tell them you dispatched it; offer to check the inbox
   later or when they ask.
-- Use `delegate` for long work with ownership, acknowledgement,
+- Use `delegate` / `delegate_team` for long work with ownership, acknowledgement,
   progress, review, file scope, or evidence tracking.
+- Board-visible work must be a task. `send`, `send_team`, `ask`, and
+  `ask_team` are messages only; they do not create `open_tasks` or
+  `active_tasks` on `project_board` / `team_board`. If the user expects
+  work to appear on a board, use `delegate_team` for team work,
+  `delegate` for a known worker, or `create_task` + `assign_task`.
 
 ## Choosing between specific name and ask_best
 
@@ -138,6 +152,10 @@ JSON. The user wants the answer, not the message envelope.
 - Record progress/phase/log notes with `record_task_event`; use
   `task_result` before handoff or verification, and `cancel_task` for
   superseded work.
+- Keep task states stable and use phases for workflow lanes:
+  `planning`, `editing`, `testing`, `review`, and `done`. Pin memories
+  for decisions, active risks, and handoffs so new sessions can recover
+  context with `session_brief`.
 - Run `review_gate` before commit/push so active tasks, pending reviews,
   scope conflicts, and unsafe final-report flags block the merge.
 - Helper agents must not deploy, push, or modify shared production

@@ -80,7 +80,7 @@ via a PR but adoption + quality bar is high. Realistic milestone:
 ```json
 {
   "name": "agent-bus",
-    "description": "Local message bus for AI agent-to-agent communication. 57 MCP tools across messaging, team-scoped send/ask/delegation/boards, channels, capability routing, conversation threads, first-class tasks, task events, result bundles, cancellation, status boards, decisions, memories, session briefs, review gates, and final reports. Lets multiple Claude Code, Codex, and Cursor sessions on the same machine collaborate via a single SQLite file. Ships the universal `agent-bus` Agent Skill plus /main and /listen slash commands.",
+    "description": "Local message bus for AI agent-to-agent communication. 57 MCP tools across messaging, team-scoped send/ask/delegation/boards, workflow Kanban, channels, capability routing, conversation threads, first-class tasks, task events, result bundles, cancellation, status boards, decisions, memories, session briefs, review gates, and final reports. Lets multiple Claude Code, Codex, and Cursor sessions on the same machine collaborate via a single SQLite file. Ships the universal `agent-bus` Agent Skill plus /main and /listen slash commands.",
   "author": {
     "name": "Mustapha Achtaou"
   },
