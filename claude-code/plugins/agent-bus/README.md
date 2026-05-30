@@ -1,6 +1,6 @@
 # agent-bus (Claude Code plugin)
 
-Local message bus for AI agent-to-agent communication. Installs the `agent-bus` MCP server (57 tools, including team-scoped send/ask/delegation/boards and workflow Kanban), the universal coordinator skill, two slash commands, and a Stop hook for listener resilience.
+Local message bus for AI agent-to-agent communication. Installs the `agent-bus` MCP server (57 tools, including team-scoped send/ask/delegation/boards and workflow Kanban), CLI views including team chat, the universal coordinator skill, two slash commands, and a Stop hook for listener resilience.
 
 ## What you get after install
 
