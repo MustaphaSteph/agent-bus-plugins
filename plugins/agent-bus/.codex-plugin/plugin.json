@@ -1,7 +1,7 @@
 {
   "name": "agent-bus",
-  "version": "0.18.0",
-  "description": "Local message bus for agent-to-agent communication across Claude/Codex/Cursor sessions on the same machine. Adds the agent-bus MCP server (60 tools, including team-scoped routing, tracked tasks, activity timelines, and cockpit dashboards) and the universal coordinator skill. Optional Stop hook for listener resilience (off by default).",
+  "version": "0.19.0",
+  "description": "Local message bus for agent-to-agent communication across Claude/Codex/Cursor sessions on the same machine. Adds the agent-bus MCP server (62 tools, including team-scoped routing, tracked tasks, truncation-safe inbox previews, activity timelines, and cockpit dashboards) and the universal coordinator skill. Optional Stop hook for listener resilience (off by default).",
   "author": {
     "name": "Mustapha Achtaou",
     "url": "https://github.com/MustaphaSteph"
@@ -24,7 +24,7 @@
   "interface": {
     "displayName": "agent-bus",
     "shortDescription": "Talk between Claude/Codex/Cursor sessions",
-    "longDescription": "Coordinate work across multiple AI agent sessions on the same machine via a local SQLite-backed message bus. Register session names, delegate to helpers, get a second opinion, ask specialists by capability, message scoped teams, broadcast to channels, track shared tasks, record task progress, show activity timelines and cockpit dashboards, set visible current work, record decisions, and generate review gates/final reports. Requires @agent-bus-connect/cli on PATH.",
+    "longDescription": "Coordinate work across multiple AI agent sessions on the same machine via a local SQLite-backed message bus. Register session names, delegate to helpers, get a second opinion, ask specialists by capability, message scoped teams, preview large inbox messages safely, broadcast to channels, track shared tasks, record task progress, show activity timelines and cockpit dashboards, set visible current work, record decisions, and generate review gates/final reports. Requires @agent-bus-connect/cli on PATH.",
     "developerName": "Mustapha Achtaou",
     "category": "Productivity",
     "capabilities": [
