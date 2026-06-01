@@ -1,7 +1,7 @@
 {
   "name": "agent-bus",
-  "version": "0.19.0",
-  "description": "Local message bus for AI agent-to-agent communication. Adds 62 MCP tools, including team-scoped routing, tracked tasks, truncation-safe inbox previews, activity timelines, cockpit dashboards, the agent-bus coordinator skill, /main and /listen slash commands, and a Stop hook for listener resilience.",
+  "version": "0.20.0",
+  "description": "Local message bus for AI agent-to-agent communication. Adds 62 MCP tools and a local web cockpit, including team-scoped routing, tracked tasks, truncation-safe inbox previews, activity timelines, the agent-bus coordinator skill, /main and /listen slash commands, and a Stop hook for listener resilience.",
   "author": {
     "name": "Mustapha Achtaou",
     "url": "https://github.com/MustaphaSteph"
