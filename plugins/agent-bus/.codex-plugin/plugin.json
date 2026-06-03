@@ -1,6 +1,6 @@
 {
   "name": "agent-bus",
-  "version": "0.21.0",
+  "version": "0.22.0",
   "description": "Local message bus for agent-to-agent communication across Claude/Codex/Cursor sessions on the same machine. Adds the agent-bus MCP server (62 tools plus a Slack-style multi-project web cockpit, including team-scoped routing, tracked tasks, truncation-safe inbox previews, and activity timelines) and the universal coordinator skill. Optional Stop hook for listener resilience (off by default).",
   "author": {
     "name": "Mustapha Achtaou",
