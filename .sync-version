@@ -1,7 +1,7 @@
 {
-  "source": "local:../agent-bus",
-  "ref": "b5b11b2",
-  "dirty": "dirty",
+  "source": "ref:main",
+  "ref": "0c23248",
+  "dirty": "",
   "skill_path": "skills/agent-bus",
-  "synced_at": "2026-06-03T00:15:57Z"
+  "synced_at": "2026-06-05T11:09:39Z"
 }
