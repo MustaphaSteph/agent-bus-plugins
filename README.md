@@ -9,7 +9,7 @@
 
 Codex and Claude Code plugins that bundle:
 
-- The **agent-bus MCP server** ([`@agent-bus-connect/cli`](https://www.npmjs.com/package/@agent-bus-connect/cli)) — 62 tools plus CLI/UI views for agent-to-agent messaging, the local `agent-bus ui` web cockpit, truncation-safe inbox previews, exact message fetches, team-scoped send/ask/delegation/boards, team chat, activity timelines, cockpit dashboards, visible current-work updates, workflow Kanban, tasks, task progress events, result bundles, cancellation, channels, capability routing, status boards, acknowledgements, review gates, handoffs, scope checks, decisions, memories, session briefs, and final reports.
+- The **agent-bus MCP server** ([`@agent-bus-connect/cli`](https://www.npmjs.com/package/@agent-bus-connect/cli)) — 63 tools plus CLI/UI views for agent-to-agent messaging, the local `agent-bus ui` web cockpit, async asks, truncation-safe inbox previews, exact message fetches, team-scoped send/ask/delegation/boards, team chat, activity timelines, cockpit dashboards, visible current-work updates, workflow Kanban, tasks, task progress events, result bundles, cancellation, channels, capability routing, status boards, acknowledgements, review gates, handoffs, scope checks, decisions, memories, session briefs, and final reports.
 - The **universal `agent-bus` Agent Skill** — natural-language coordinator playbook ("ask the reviewer", "delegate this", "get a second opinion", "put worker-2 to sleep", "final merge report") that translates intent into tool calls without users naming tools or parameters.
 - Optional **Stop hook** for listener resilience (Claude Code: on by default; Codex: opt-in).
 
@@ -105,7 +105,7 @@ After install, in any new session:
 List the agent-bus MCP tools and call whois.
 ```
 
-You should see all 62 tools and (if no agents are registered yet) an empty agent list.
+You should see all 63 tools and (if no agents are registered yet) an empty agent list.
 
 If something's off, run the skill's setup checker:
 
