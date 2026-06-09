@@ -1,12 +1,12 @@
 # agent-bus (Claude Code plugin)
 
-Local message bus for AI agent-to-agent communication. Installs the `agent-bus` MCP server (63 tools, including async asks, truncation-safe inbox previews, exact message fetches, team-scoped send/ask/delegation/boards, activity timelines, cockpit dashboards, visible current-work updates, and workflow Kanban), CLI/UI views including the Slack-style local `agent-bus ui` web cockpit and team chat, the universal coordinator skill, two slash commands, and a Stop hook for listener resilience.
+Local message bus for AI agent-to-agent communication. Installs the `agent-bus` MCP server (65 tools, including async asks, truncation-safe inbox previews, exact message fetches, team-scoped send/ask/delegation/boards, roster cleanup, activity timelines, cockpit dashboards, visible current-work updates, and workflow Kanban), CLI/UI views including the Slack-style local `agent-bus ui` web cockpit and team chat, the universal coordinator skill, two slash commands, and a Stop hook for listener resilience.
 
 ## What you get after install
 
 | Surface | Effect |
 |---|---|
-| **63 MCP tools + UI** | Messaging, ask/reply, async asks, truncation-safe inbox previews, exact message fetches, team-scoped send/ask/delegation/boards, Slack-style multi-project local web cockpit, activity timelines, cockpit dashboards, visible current-work updates, workflow Kanban, channels, capability/role routing, `directory`, project/area-scoped reads, first-class tasks, assignment, acknowledgements, task progress events, task result bundles, cancellation, review gates, handoffs, scope checks, status controls, decisions, memories, session briefs, and final reports. |
+| **65 MCP tools + UI** | Messaging, ask/reply, async asks, truncation-safe inbox previews, exact message fetches, team-scoped send/ask/delegation/boards, roster cleanup, Slack-style multi-project local web cockpit, activity timelines, cockpit dashboards, visible current-work updates, workflow Kanban, channels, capability/role routing, `directory`, project/area-scoped reads, first-class tasks, assignment, acknowledgements, task progress events, task result bundles, cancellation, review gates, handoffs, scope checks, status controls, decisions, memories, session briefs, and final reports. |
 | **`/main <name>` slash command** | Primes a coordinator session to translate natural language ("ask the reviewer", "delegate this", "put worker-2 to sleep", "final merge report") into the right bus calls. No tool names to remember. |
 | **`/listen <name>` slash command** | Turns a session into a silent helper that responds when called. |
 | **`agent-bus` skill** | The cross-tool playbook bundled as an Agent Skill. Loads on demand via progressive disclosure. |
