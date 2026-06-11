@@ -1,6 +1,6 @@
 {
   "name": "agent-bus-plugins",
-  "version": "0.30.0",
+  "version": "0.31.0",
   "private": true,
   "description": "Codex and Claude Code plugins that bundle the agent-bus MCP server, slash commands, and the universal agent-bus skill.",
   "license": "MIT",
