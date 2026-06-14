@@ -1,0 +1,37 @@
+{
+  "name": "agent-bus",
+  "version": "0.32.0",
+  "description": "Local message bus for coordinating Claude, Codex, Kimi, Cursor, Gemini CLI, and other MCP-capable agent sessions on the same machine.",
+  "keywords": [
+    "mcp",
+    "multi-agent",
+    "agent-to-agent",
+    "local-first",
+    "sqlite",
+    "coordination"
+  ],
+  "author": {
+    "name": "Mustapha Achtaou",
+    "url": "https://github.com/MustaphaSteph"
+  },
+  "homepage": "https://github.com/MustaphaSteph/agent-bus",
+  "license": "MIT",
+  "skills": "./skills/",
+  "sessionStart": {
+    "skill": "agent-bus-read-first"
+  },
+  "skillInstructions": "agent-bus requires @agent-bus-connect/cli on PATH. If agent-bus MCP tools are missing or setup looks broken, run the bundled setup checker or ask the user to run: npm i -g @agent-bus-connect/cli@latest.",
+  "mcpServers": {
+    "agent-bus": {
+      "command": "agent-bus-mcp",
+      "args": []
+    }
+  },
+  "interface": {
+    "displayName": "agent-bus",
+    "shortDescription": "Connect local AI agent sessions",
+    "longDescription": "Coordinate multiple local AI coding sessions with team chat, tracked tasks, Kanban, memories, review gates, final reports, and a local web cockpit. Works across Claude, Codex, Kimi, Cursor, Gemini CLI, and any MCP-capable client.",
+    "developerName": "Mustapha Achtaou",
+    "websiteURL": "https://github.com/MustaphaSteph/agent-bus"
+  }
+}

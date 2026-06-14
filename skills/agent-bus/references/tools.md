@@ -1,0 +1,697 @@
+# agent-bus MCP tools — quick reference
+
+Load this when you need the exact contract for a tool the SKILL.md
+doesn't cover in detail. There are 65 MCP tools. All return JSON.
+Errors return `{ error: { code: string, message: string } }` with
+`isError: true`.
+
+Use project/area/team defaults unless the user asks for a broader view.
+`project: "*"` means all projects. `area: "*"` means all areas.
+`team: "*"` means all teams.
+
+## Identity and Team Board
+
+### register
+Claim or refresh a name on the bus. Use `replace: true` for stable
+agent identities across restarts.
+```ts
+register({
+  name: string,
+  capabilities?: string[],
+  replace?: boolean,
+  project?: string | null,
+  area?: string | null,
+  team?: string | null,
+  role?: string | null,
+  routing_weight?: number,
+  status?: "idle" | "working" | "blocked" | "waiting_review" | "sleeping",
+  session_id?: string | null,
+}) -> Agent & {
+  scope_summary?: {
+    pinned_handoffs: number,
+    pinned_risks: number,
+    open_tasks: number,
+    blocked_tasks: number,
+    recent_decisions_7d: number,
+    recent_memories_7d: number,
+    last_activity_at: number | null,
+  },
+  suggested_next_actions?: string[],
+}
+```
+Capabilities are exact-match tags. Use namespaced tags for native powers:
+`tool:websearch`, `tool:shell`, `mcp:posthog`, `skill:flowdeck`,
+`subagent:Explore`.
+
+### whois / directory
+```ts
+whois({ project?: string | "*", area?: string | "*", team?: string | "*" }) -> Agent[]
+directory({ project?: string | "*", area?: string | "*", team?: string | "*" }) -> AgentDirectoryEntry[]
+wait_for_agents({
+  names: string[],
+  project?: string | "*",
+  area?: string | "*",
+  team?: string | "*",
+  timeout_s?: number,
+}) -> { ready: AgentDirectoryEntry[], missing: string[], stale: AgentDirectoryEntry[], wrong_scope: unknown[] }
+```
+`directory` includes presence, status, age, role, area, and active task.
+Prefer it for manager/team-board views.
+
+### remove_agent / delete_team
+```ts
+remove_agent({
+  name: string,
+  release_tasks?: boolean,
+  force?: boolean,
+}) -> { removed_agent: Agent, active_tasks: number[], released_tasks: number[], subscriptions_deleted: number, preserved_history: true }
+
+delete_team({
+  team: string,
+  project?: string | "*",
+  area?: string | "*",
+  release_tasks?: boolean,
+  force?: boolean,
+}) -> { team: string, removed_agents: string[], active_tasks: number[], released_tasks: number[], unscoped: Record<string, number>, preserved_history: true }
+```
+Use these only for explicit cleanup requests. They preserve audit history.
+If active tasks exist, pass `release_tasks: true` only when the user wants
+those tasks reopened.
+
+### set_agent_status / sleep_agent / wake_agent
+```ts
+set_agent_status({ agent: string, status: "idle" | "working" | "blocked" | "waiting_review" | "sleeping" }) -> Agent
+sleep_agent({ agent: string }) -> Agent
+wake_agent({ agent: string }) -> Agent
+```
+Status is manager metadata, separate from `pause`/`resume` delivery.
+
+## Direct Messaging
+
+### send
+```ts
+send({
+  from: string,
+  to: string,
+  message: string,
+  thread_id?: string,
+  priority?: "low" | "normal" | "high" | "urgent",
+}) -> Message
+```
+
+### inbox / inbox_status / ack
+```ts
+inbox({
+  agent: string,
+  project?: string,
+  area?: string,
+  team?: string,         // concrete team only; "*" means all teams
+  thread_id?: string,
+  wait_s?: number,       // max 110
+  claim_s?: number,      // at-least-once mode; ack after processing
+  since_id?: number,
+  mark_delivered?: boolean,
+  limit?: number,
+}) -> Message[]
+
+inbox_status({
+  agent: string,
+  project?: string,
+  area?: string,
+  team?: string,
+  thread_id?: string,
+  since_id?: number,
+  limit?: number,
+}) -> {
+  unread: Message[],
+  in_flight: Message[],
+  delivered_recent: Message[],
+  last_message: Message | null,
+  next_claim_deadline: number | null,
+  summary: string,
+}
+
+ack({ agent: string, message_id: number }) -> Message
+```
+Use `wait_s: 110` for listener loops. A blocking wait stamps the agent
+as `listening` until the wait window expires. Use `claim_s` for work
+that must not be lost; skipped ack means redelivery after the claim
+expires.
+In team workflows, pass your concrete `team` to `inbox` and
+`inbox_status` so unrelated direct or cross-team messages stay queued
+until you intentionally read all teams.
+Use `thread_id` to read or consume only one conversation.
+Use `inbox_status` when you need to inspect unread/claimed/recent
+delivery state without consuming anything.
+
+Use `inbox_previews` when the inbox may contain huge content:
+
+```ts
+inbox_previews({
+  agent: string,
+  project?: string,
+  area?: string,
+  team?: string | "*",
+  thread_id?: string,
+  since_id?: number,
+  wait_s?: number,
+  limit?: number,
+  preview_chars?: number,
+}) -> MessagePreview[]
+
+get_message({
+  message_id: number,
+  include_content?: boolean,
+  preview_chars?: number,
+}) -> { message: Message | MessagePreview, full_content_included: boolean, suggested_next_actions: string[] }
+```
+
+`MessagePreview` replaces `content` with `content_preview`,
+`content_length`, and `truncated`. Use it to avoid tool-result
+truncation; fetch full content only for one exact message when needed.
+
+## Request / Response
+
+### ask / ask_async / ask_best / reply / reply_thread
+```ts
+ask({
+  from: string,
+  to: string,
+  question: string,
+  timeout_s?: number,    // max 110
+  thread_id?: string,
+  priority?: "low" | "normal" | "high" | "urgent",
+}) -> Message
+
+ask_async({
+  from: string,
+  to: string,
+  question: string,
+  thread_id?: string,
+}) -> {
+  ask: Message,
+  recipient: AgentDirectoryEntry | null,
+  suggested_next_actions: string[],
+}
+
+ask_best({
+  from: string,
+  capability: string,
+  question: string,
+  timeout_s?: number,
+  thread_id?: string,
+  project?: string | "*",
+  area?: string | "*",
+  team?: string | "*",
+  role?: string,
+  priority?: "low" | "normal" | "high" | "urgent",
+}) -> Message
+
+reply({ from: string, ask_id: number, answer: string }) -> Message
+reply_thread({ from: string, thread_id: string, message: string }) -> Message
+
+message_status({ message_id: number }) -> {
+  message: Message,
+  reply: Message | null,
+  recipient: AgentDirectoryEntry | null,
+  related_task: Task | null,
+  diagnostics: string[],
+  suggested_next_actions: string[],
+}
+
+why_no_reply({ message_id: number }) -> same shape
+```
+`ask_best` defaults to the caller's project/area/team and refuses stale
+agents. Use wildcards only for deliberate cross-project/cross-area/team work.
+Use `reply_thread` when continuing a conversation and the recipient is
+obvious from thread history. Use `message_status`/`why_no_reply` before
+guessing that an agent ignored an ask.
+Blocking `ask` fails fast for stale/paused recipients; use `ask_async`
+when the recipient may not be listening. `reply` handles both asks and
+normal messages: for `kind === "ask"` it answers that ask; for
+`kind === "msg"` it infers the thread and creates a threaded reply.
+
+## Channels
+
+```ts
+subscribe({ agent: string, channel: string }) -> Subscription
+unsubscribe({ agent: string, channel: string }) -> { ok: true }
+send_channel({ from: string, channel: string, message: string, thread_id?: string }) -> Message[]
+subscribers({ channel: string }) -> string[]
+```
+
+## Teams
+
+Teams are neutral scope metadata for workgroups inside a project/area.
+They do not hard-code roles or behavior.
+
+```ts
+send_team({
+  from: string,
+  team?: string,              // default sender's team
+  message: string,
+  thread_id?: string,
+  project?: string | "*",
+  area?: string | "*",
+  include_self?: boolean,
+}) -> Message[]
+
+ask_team({
+  from: string,
+  team?: string,              // default sender's team
+  question: string,
+  timeout_s?: number,
+  thread_id?: string,
+  project?: string | "*",
+  area?: string | "*",
+  capability?: string,
+  role?: string,
+}) -> Message
+
+team_board({ team: string, project?: string | "*", area?: string | "*", limit?: number }) -> ProjectBoard
+```
+
+Use `send_team` for fan-out to active members of the workgroup.
+Use `ask_team` for one best responder inside that workgroup.
+Use `team_board` when a coordinator wants a board scoped to one team.
+
+## Discovery
+
+```ts
+thread({ thread_id: string, limit?: number }) -> Message[]
+recent({ limit?: number, project?: string | "*", area?: string | "*", team?: string | "*" }) -> Message[]
+```
+
+## Tasks
+
+### create_task
+```ts
+create_task({
+  requested_by: string,
+  title: string,
+  description?: string,
+  thread_id?: string,
+  state?: "backlog" | "open",
+  milestone?: string | null,
+  priority?: number,
+  cwd?: string,
+  blocked_on_task_id?: number,
+  required_capability?: string,
+  project?: string | null,
+  area?: string | null,
+  team?: string | null,
+  mode?: "investigate_only" | "propose_patch" | "edit_files" | "test_only",
+  expected_output?: string,
+  deadline_at?: string,
+  checkin_at?: string,
+  edit_scope?: string[],
+  read_scope?: string[],
+  file_scope?: string[],
+  ack_required?: boolean,
+  review_required?: boolean,
+  changed_files?: string[],
+  phase?: string | null,
+  session_id?: string | null,
+  allow_conflicts?: boolean,
+}) -> Task
+```
+
+### claim_task / assign_task / claim_best_task
+```ts
+claim_task({ agent: string, task_id: number, allow_conflicts?: boolean }) -> Task
+assign_task({ task_id: number, to_agent: string, allow_conflicts?: boolean, allow_pending_agent?: boolean }) -> Task
+claim_best_task({
+  agent: string,
+  project?: string | "*",
+  area?: string | "*",
+  required_capability?: string,
+}) -> Task | null
+```
+Use `assign_task` when the manager chooses the worker. Use
+`claim_best_task` when a worker asks for its next best open task.
+Backlog tasks are ignored until promoted. Use `allow_pending_agent` to
+reserve work before a worker registers.
+
+### delegate
+```ts
+delegate({
+  from: string,
+  to_agent: string,
+  title: string,
+  description?: string,
+  milestone?: string | null,
+  mode?: "investigate_only" | "propose_patch" | "edit_files" | "test_only",
+  expected_output?: string | null,
+  priority?: number,
+  cwd?: string,
+  thread_id?: string,
+  project?: string | null,
+  area?: string | null,
+  team?: string | null,
+  required_capability?: string | null,
+  deadline_at?: number | null,
+  checkin_at?: number | null,
+  edit_scope?: string[],
+  read_scope?: string[],
+  file_scope?: string[],
+  ack_required?: boolean,
+  review_required?: boolean,
+  allow_pending_agent?: boolean,
+  allow_conflicts?: boolean,
+}) -> { task: Task, event: TaskEvent, assigned: boolean, pending: boolean, suggested_next_actions: string[] }
+```
+Use `delegate` as the default long-work primitive. It creates the task,
+assigns it, sends the inbox notification, requires acknowledgement by
+default, and records the delegation event.
+
+### delegate_team
+```ts
+delegate_team({
+  from: string,
+  team?: string,
+  title: string,
+  description?: string,
+  milestone?: string | null,
+  mode?: "investigate_only" | "propose_patch" | "edit_files" | "test_only",
+  expected_output?: string | null,
+  priority?: number,
+  cwd?: string,
+  thread_id?: string,
+  project?: string | null,
+  area?: string | null,
+  required_capability?: string | null,
+  capability?: string,
+  role?: string,
+  deadline_at?: number | null,
+  checkin_at?: number | null,
+  edit_scope?: string[],
+  read_scope?: string[],
+  file_scope?: string[],
+  ack_required?: boolean,
+  review_required?: boolean,
+  allow_conflicts?: boolean,
+  include_self?: boolean,
+  max_recipients?: number,
+}) -> { team: string, thread_id: string, expected_count: number, delegated_count: number, tasks: DelegateResult[], skipped: { name: string, reason: string }[], suggested_next_actions: string[] }
+```
+Use `delegate_team` when a team assignment must show on
+`team_board`, `kanban`, or `done`. It creates one tracked task per
+active matching team member and reports skipped members.
+
+### update_task / release_task / list_tasks / get_task
+```ts
+update_task({
+  agent: string,
+  task_id: number,
+  state?: "backlog" | "open" | "claimed" | "working" | "blocked" | "completed" | "failed" | "canceled",
+  blocked_reason?: string | null,
+  blocked_on_task_id?: number | null,
+  result?: string | null,
+  milestone?: string | null,
+  priority?: number,
+  required_capability?: string | null,
+  mode?: "investigate_only" | "propose_patch" | "edit_files" | "test_only",
+  expected_output?: string | null,
+  deadline_at?: string | null,
+  checkin_at?: string | null,
+  final_answer?: string | null,
+  manager_reviewed?: boolean,
+  edit_scope?: string[],
+  read_scope?: string[],
+  file_scope?: string[],
+  ack_required?: boolean,
+  review_required?: boolean,
+  review_state?: "none" | "pending" | "approved" | "changes_requested",
+  reviewed_by?: string | null,
+  review_notes?: string | null,
+  changed_files?: string[],
+  allow_conflicts?: boolean,
+}) -> Task
+
+release_task({ agent: string, task_id: number }) -> Task
+
+list_tasks({
+  state?: TaskState | TaskState[],
+  claimed_by?: string,
+  requested_by?: string,
+  thread_id?: string,
+  include_terminal?: boolean,
+  limit?: number,
+  project?: string | "*",
+  area?: string | "*",
+  team?: string | "*",
+  required_capability?: string,
+  mode?: "investigate_only" | "propose_patch" | "edit_files" | "test_only",
+  milestone?: string,
+  manager_reviewed?: boolean,
+}) -> Task[]
+
+get_task({ task_id: number }) -> Task
+```
+Terminal states cannot transition. Backlog tasks are parked ideas:
+`backlog -> open|canceled`, `open -> backlog|claimed|canceled`. Moving
+to backlog clears active holder/pending-assignee fields. Only requester
+or current holder can update/release. Stale active tasks are surfaced,
+not auto-requeued.
+
+### acknowledge_task / submit_review / handoff_task
+```ts
+acknowledge_task({
+  agent: string,
+  task_id: number,
+  response: "claimed" | "declined" | "blocked",
+  note?: string,
+}) -> Task
+
+submit_review({
+  reviewer: string,
+  task_id: number,
+  approved: boolean,
+  notes?: string,
+}) -> Task
+
+handoff_task({
+  from_agent: string,
+  task_id: number,
+  to_agent?: string,
+  reason: string,
+  memory?: string,
+}) -> { task: Task, memory: Memory, message: Message | null }
+```
+Use acknowledgements to remove uncertainty after assignment. Use
+`submit_review` for verifier approval; review-required tasks cannot be
+completed until approved. Use `handoff_task` when a session stops
+mid-task; it records a pinned handoff memory and can reassign the work.
+
+### check_scope_conflicts / project_board
+```ts
+check_scope_conflicts({
+  file_scope?: string[],
+  edit_scope?: string[],
+  project?: string | "*",
+  area?: string | "*",
+  team?: string | "*",
+  exclude_task_id?: number,
+}) -> ScopeConflict[]
+
+project_board({
+  project?: string | "*",
+  area?: string | "*",
+  team?: string | "*",
+}) -> {
+  agents: AgentDirectoryEntry[],
+  open_tasks: Task[],
+  active_tasks: Task[],
+  blocked_tasks: Task[],
+  waiting_review: Task[],
+  waiting_acknowledgement: Task[],
+  stale_tasks: Task[],
+  scope_conflicts: ScopeConflict[],
+  pinned_risks: Memory[],
+  pinned_handoffs: Memory[],
+  suggested_next_actions: string[],
+}
+
+activity({ project?: string | "*", area?: string | "*", team?: string | "*", since?: number, limit?: number }) -> ActivityItem[]
+cockpit({ project?: string | "*", area?: string | "*", team?: string | "*", agent?: string, limit?: number }) -> { waiting_on: string[], ready: string[], blockers: string[], suggested_next_actions: string[], board: ProjectBoard }
+now({ agent: string, task_id?: number, phase?: string | null, note?: string | null, status?: AgentStatus }) -> { agent: Agent, task: Task | null, event: TaskEvent | null, suggested_next_actions: string[] }
+```
+Use `project_board` for manager status. It combines agent status, task
+state, review queue, pending acknowledgements, stale work, scope
+conflicts, pinned risks/handoffs, and suggested next actions. Scope
+conflicts compare edit ownership; broad verifier read scope should not
+block workers.
+Use `activity` when the user asks what happened recently, `cockpit`
+when the coordinator needs the next action, and `now` when an agent
+wants to update visible current work with one tool call.
+
+## Decisions and Final Report
+
+```ts
+record_decision({
+  by_agent: string,
+  decision: string,
+  rationale?: string,
+  implemented?: boolean,
+  project?: string | null,
+  area?: string | null,
+}) -> Decision
+
+list_decisions({ project?: string | "*", area?: string | "*", limit?: number }) -> Decision[]
+
+record_test_result({
+  by_agent: string,
+  task_id?: number | null,
+  command: string,
+  status: "passed" | "failed" | "skipped",
+  output_summary?: string | null,
+  project?: string | null,
+  area?: string | null,
+}) -> TestResult
+
+list_test_results({
+  task_id?: number,
+  by_agent?: string,
+  status?: "passed" | "failed" | "skipped",
+  project?: string | "*",
+  area?: string | "*",
+  limit?: number,
+}) -> TestResult[]
+
+record_task_event({
+  by_agent: string,
+  task_id: number,
+  event_type?: "note" | "phase" | "progress" | "log" | "result" | "cancel",
+  message: string,
+  phase?: string | null,
+  metadata?: Record<string, unknown>,
+}) -> TaskEvent
+
+Use phases consistently: `planning`, `editing`, `testing`, `review`,
+and `done`. Kanban views derive human lanes from stable state plus
+phase, so do not invent new task states for phases.
+
+list_task_events({
+  task_id?: number,
+  by_agent?: string,
+  event_type?: "note" | "phase" | "progress" | "log" | "result" | "cancel",
+  project?: string | "*",
+  area?: string | "*",
+  limit?: number,
+}) -> TaskEvent[]
+
+task_result({ task_id: number, limit?: number }) -> {
+  task: Task,
+  events: TaskEvent[],
+  test_results: TestResult[],
+  memories: Memory[],
+  messages: Message[],
+}
+
+wait_for_task({
+  task_id: number,
+  wait_s?: number,
+  since_updated_at?: number,
+  limit?: number,
+}) -> TaskResult & {
+  timed_out: boolean,
+  holder: AgentDirectoryEntry | null,
+  latest_event: TaskEvent | null,
+  latest_message: Message | null,
+  latest_test_result: TestResult | null,
+  suggested_next_actions: string[],
+}
+
+cancel_task({
+  agent: string,
+  task_id: number,
+  reason?: string | null,
+}) -> { task: Task, event: TaskEvent }
+
+remember({
+  by_agent: string,
+  kind: "summary" | "handoff" | "risk" | "todo" | "fact" | "blocker" | "lesson" | "gotcha" | string,
+  content: string,
+  agent?: string | null,
+  project?: string | null,
+  area?: string | null,
+  task_id?: number | null,
+  thread_id?: string | null,
+  pinned?: boolean,
+  supersedes_id?: number | null,
+}) -> Memory
+
+list_memories({
+  project?: string | "*",
+  area?: string | "*",
+  agent?: string,
+  kind?: string,
+  task_id?: number,
+  thread_id?: string,
+  pinned?: boolean,
+  since?: number,
+  limit?: number,
+}) -> Memory[]
+
+pin_memory({ memory_id: number }) -> Memory
+unpin_memory({ memory_id: number }) -> Memory
+
+session_brief({
+  project?: string | "*",
+  area?: string | "*",
+  team?: string | "*",
+  agent?: string,
+  limit?: number,
+  recent_window_ms?: number,
+}) -> {
+  active_agents: AgentDirectoryEntry[],
+  open_tasks: Task[],
+  blocked_tasks: Task[],
+  stale_tasks: Task[],
+  recent_decisions: Decision[],
+  pinned_memories: Memory[],
+  recent_memories: Memory[],
+  recent_messages: Message[],
+  suggested_next_actions: string[],
+}
+
+final_report({ project?: string | "*", area?: string | "*" }) -> {
+  implemented: string[],
+  not_implemented: string[],
+  known_risks: string[],
+  tests_passed: string[],
+  test_results: TestResult[],
+  manual_tests_needed: string[],
+  warnings: string[],
+  safe_to_commit: boolean,
+  safe_to_push: boolean,
+  safe_to_deploy: boolean,
+}
+
+review_gate({ project?: string | "*", area?: string | "*" }) -> {
+  ok: boolean,
+  blockers: string[],
+  warnings: string[],
+  final_report: FinalReport,
+  board: ProjectBoard,
+}
+```
+
+## Error codes summary
+
+| Code | Recovery hint |
+|---|---|
+| `INVALID_INPUT` | Fix name/channel/project/area format or invalid enum |
+| `UNKNOWN_AGENT` | Use `directory`/`whois`; register a helper or broaden scope |
+| `NAME_TAKEN` | Use `replace: true` intentionally or pick a new name |
+| `ASK_TIMEOUT` | Switch to `ask_async`/`send`, increase readiness, or nudge the recipient |
+| `ASK_CYCLE` | Resolve the active opposite ask named in the error first, inspect it with `message_status`, or switch to `ask_async`/`send`; stale opposite asks no longer block |
+| `ASK_NOT_FOUND` | Check the id with `get_message`/`inbox_previews` |
+| `ASK_RECIPIENT_UNAVAILABLE` | Recipient is stale/paused; use `ask_async`, `send`, `delegate`, or wake them |
+| `TEAM_NOT_FOUND` | Check `team_board`/`directory`; the team may already be deleted or scoped differently |
+| `AGENT_HAS_ACTIVE_TASKS` | Review active tasks; pass `release_tasks: true` only if cleanup should reopen them |
+| `TEAM_HAS_ACTIVE_TASKS` | Review active team tasks; pass `release_tasks: true` only if cleanup should reopen them |
+| `TASK_NOT_FOUND` | Verify with `list_tasks` |
+| `TASK_NOT_CLAIMABLE` | Task is already claimed or not open |
+| `TASK_INVALID_TRANSITION` | Check current task state and allowed transitions |
+| `TASK_FORBIDDEN` | Only requester or current holder can update/release |

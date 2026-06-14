@@ -1,0 +1,32 @@
+{
+  "$schema": "https://cursor.com/schemas/cursor-plugin/plugin.json",
+  "name": "agent-bus",
+  "displayName": "agent-bus",
+  "version": "0.32.0",
+  "description": "Local message bus for coordinating Claude, Codex, Cursor, Kimi, Gemini CLI, and other MCP-capable agent sessions.",
+  "author": {
+    "name": "Mustapha Achtaou"
+  },
+  "publisher": "MustaphaSteph",
+  "homepage": "https://github.com/MustaphaSteph/agent-bus",
+  "repository": "https://github.com/MustaphaSteph/agent-bus-plugins",
+  "license": "MIT",
+  "category": "developer-tools",
+  "keywords": [
+    "mcp",
+    "multi-agent",
+    "agent-bus",
+    "claude",
+    "codex",
+    "kimi",
+    "cursor"
+  ],
+  "tags": [
+    "mcp",
+    "multi-agent",
+    "coordination",
+    "workflow"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json"
+}

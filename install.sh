@@ -2,9 +2,10 @@
 # agent-bus universal fallback installer.
 #
 # For agent clients that support the Agent Skills format but don't have a
-# plugin marketplace (Cursor, Gemini CLI, Goose, OpenCode, Junie, Amp,
-# Kiro, fast-agent, …), this script drops the canonical `agent-bus`
-# skill into each tool's skills directory it can detect. By default it
+# plugin marketplace (Kimi Code, Cursor, Gemini CLI, Goose, OpenCode,
+# Junie, Amp, Kiro, fast-agent, ...), this script drops the root
+# agent-bus skill pack into each tool's skills directory it can detect.
+# By default it
 # only verifies whether the CLI is present and prints the npm command.
 # Pass --install-cli to install/upgrade the MCP server CLI via npm.
 #
@@ -75,52 +76,58 @@ install_cli() {
   hash -r 2>/dev/null || true
 }
 
-# ---- locate the source skill ----
+# ---- locate the source skills ----
 
-# When run from a clone, the skill lives at skills/agent-bus next to this
-# script. When piped over curl, we need to fetch the skill tarball.
+# When run from a clone, the skill pack lives at skills/ next to this
+# script. When piped over curl, fetch the plugin repo tarball so wrapper
+# skills and the canonical agent-bus skill install together.
 SCRIPT_DIR="$(cd "$(dirname "$0")" 2>/dev/null && pwd || pwd)"
-SOURCE_SKILL=""
-TMP_SKILL=""
+SOURCE_SKILLS_DIR=""
+TMP_SKILLS=""
 cleanup() {
-  if [ -n "$TMP_SKILL" ] && [ -d "$TMP_SKILL" ]; then
-    rm -rf "$TMP_SKILL"
+  if [ -n "$TMP_SKILLS" ] && [ -d "$TMP_SKILLS" ]; then
+    rm -rf "$TMP_SKILLS"
   fi
 }
 trap cleanup EXIT INT HUP TERM
 
-if [ -d "$SCRIPT_DIR/skills/agent-bus" ]; then
-  # We're at the main repo root.
-  SOURCE_SKILL="$SCRIPT_DIR/skills/agent-bus"
+if [ -d "$SCRIPT_DIR/skills" ] && [ -f "$SCRIPT_DIR/skills/agent-bus/SKILL.md" ]; then
+  SOURCE_SKILLS_DIR="$SCRIPT_DIR/skills"
 elif [ -d "$SCRIPT_DIR/plugins/agent-bus/skills/agent-bus" ]; then
-  # We're at the plugins repo root.
-  SOURCE_SKILL="$SCRIPT_DIR/plugins/agent-bus/skills/agent-bus"
+  TMP_SKILLS="$(mktemp -d 2>/dev/null || mktemp -d -t agent-bus-skills)"
+  mkdir -p "$TMP_SKILLS/skills"
+  cp -R "$SCRIPT_DIR/plugins/agent-bus/skills/agent-bus" "$TMP_SKILLS/skills/agent-bus"
+  SOURCE_SKILLS_DIR="$TMP_SKILLS/skills"
 elif [ -d "$SCRIPT_DIR/claude-code/plugins/agent-bus/skills/agent-bus" ]; then
-  SOURCE_SKILL="$SCRIPT_DIR/claude-code/plugins/agent-bus/skills/agent-bus"
+  TMP_SKILLS="$(mktemp -d 2>/dev/null || mktemp -d -t agent-bus-skills)"
+  mkdir -p "$TMP_SKILLS/skills"
+  cp -R "$SCRIPT_DIR/claude-code/plugins/agent-bus/skills/agent-bus" "$TMP_SKILLS/skills/agent-bus"
+  SOURCE_SKILLS_DIR="$TMP_SKILLS/skills"
 else
-  # curl-piped invocation — fetch the skill from GitHub.
-  TMP_SKILL="$(mktemp -d 2>/dev/null || mktemp -d -t agent-bus-skill)"
-  TARBALL_URL="https://github.com/MustaphaSteph/agent-bus/archive/refs/heads/main.tar.gz"
-  printf "Fetching latest agent-bus skill ...\n"
+  TMP_SKILLS="$(mktemp -d 2>/dev/null || mktemp -d -t agent-bus-skills)"
+  TARBALL_URL="https://github.com/MustaphaSteph/agent-bus-plugins/archive/refs/heads/main.tar.gz"
+  printf "Fetching latest agent-bus skill pack ...\n"
   if command -v curl >/dev/null 2>&1; then
-    curl -fsSL "$TARBALL_URL" -o "$TMP_SKILL/agent-bus.tar.gz"
+    curl -fsSL "$TARBALL_URL" -o "$TMP_SKILLS/agent-bus-plugins.tar.gz"
   elif command -v wget >/dev/null 2>&1; then
-    wget -q -O "$TMP_SKILL/agent-bus.tar.gz" "$TARBALL_URL"
+    wget -q -O "$TMP_SKILLS/agent-bus-plugins.tar.gz" "$TARBALL_URL"
   else
-    printf "ERROR: neither curl nor wget available; cannot fetch the skill\n" >&2
+    printf "ERROR: neither curl nor wget available; cannot fetch the skill pack\n" >&2
     exit 2
   fi
-  ( cd "$TMP_SKILL" && tar -xzf agent-bus.tar.gz )
-  SOURCE_SKILL="$(find "$TMP_SKILL" -type d -name "agent-bus" -path "*/skills/agent-bus" | head -1)"
+  ( cd "$TMP_SKILLS" && tar -xzf agent-bus-plugins.tar.gz )
+  SOURCE_SKILLS_DIR="$(find "$TMP_SKILLS" -type d -name "skills" -path "*/agent-bus-plugins-*/skills" | head -1)"
 fi
 
-if [ ! -f "$SOURCE_SKILL/SKILL.md" ]; then
-  printf "ERROR: could not locate the canonical agent-bus skill\n" >&2
+if [ ! -f "$SOURCE_SKILLS_DIR/agent-bus/SKILL.md" ]; then
+  printf "ERROR: could not locate the agent-bus skill pack\n" >&2
   printf "       looked in:\n" >&2
-  printf "         %s/skills/agent-bus\n" "$SCRIPT_DIR" >&2
-  printf "         %s/plugins/agent-bus/skills/agent-bus\n" "$SCRIPT_DIR" >&2
+  printf "         %s/skills\n" "$SCRIPT_DIR" >&2
+  printf "         %s/plugins/agent-bus/skills\n" "$SCRIPT_DIR" >&2
   exit 2
 fi
+
+SKILL_NAMES="$(find "$SOURCE_SKILLS_DIR" -mindepth 1 -maxdepth 1 -type d -exec sh -c '[ -f "$1/SKILL.md" ] && basename "$1"' sh {} \; | sort)"
 
 # ---- targets ----
 
@@ -135,6 +142,8 @@ candidates() {
   fi
   [ -d "$HOME/.claude" ]   && printf "Claude Code:%s/.claude/skills\n"   "$HOME"
   [ -d "$HOME/.codex" ]    && printf "Codex:%s/.codex/skills\n"          "$HOME"
+  [ -d "$HOME/.kimi" ]     && printf "Kimi Code:%s/.kimi/skills\n"       "$HOME"
+  [ -d "$HOME/.kimi-code" ] && printf "Kimi Code:%s/.kimi-code/skills\n" "$HOME"
   [ -d "$HOME/.cursor" ]   && printf "Cursor:%s/.cursor/skills\n"        "$HOME"
   [ -d "$HOME/.gemini" ]   && printf "Gemini CLI:%s/.gemini/skills\n"    "$HOME"
   [ -d "$HOME/.opencode" ] && printf "OpenCode:%s/.opencode/skills\n"    "$HOME"
@@ -152,16 +161,20 @@ CANDS="$(candidates || true)"
 if [ -z "$CANDS" ]; then
   printf "No skills-aware tool config dir detected under \$HOME.\n" >&2
   printf "Re-run with --target /path/to/skills/dir to install anyway, or install one of:\n" >&2
-  printf "  Claude Code, Codex, Cursor, Gemini CLI, OpenCode, Goose, Junie, Amp, Kiro\n" >&2
+  printf "  Claude Code, Codex, Kimi Code, Cursor, Gemini CLI, OpenCode, Goose, Junie, Amp, Kiro\n" >&2
   exit 1
 fi
 
 # ---- install ----
 
-printf "agent-bus skill — source: %s\n" "$SOURCE_SKILL"
+printf "agent-bus skill pack - source: %s\n" "$SOURCE_SKILLS_DIR"
+printf "Skills:\n"
+printf "%s\n" "$SKILL_NAMES" | while IFS= read -r NAME; do
+  [ -n "$NAME" ] && printf "  - %s\n" "$NAME"
+done
 printf "\nWill install into:\n"
 printf "%s\n" "$CANDS" | while IFS=":" read -r LABEL DIR; do
-  printf "  - %-12s %s\n" "$LABEL" "$DIR/agent-bus"
+  printf "  - %-12s %s\n" "$LABEL" "$DIR"
 done
 [ "$DRY_RUN" = "1" ] && { printf "\n(dry-run) no files written.\n"; exit 0; }
 
@@ -172,12 +185,17 @@ fi
 INSTALLED=0
 printf "\n"
 echo "$CANDS" | while IFS=":" read -r LABEL DIR; do
-  TARGET="$DIR/agent-bus"
   mkdir -p "$DIR"
-  rm -rf "$TARGET"
-  cp -R "$SOURCE_SKILL" "$TARGET"
-  find "$TARGET/scripts" -type f -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
-  printf "  ✓ %s → %s\n" "$LABEL" "$TARGET"
+  printf "%s\n" "$SKILL_NAMES" | while IFS= read -r NAME; do
+    [ -n "$NAME" ] || continue
+    SRC="$SOURCE_SKILLS_DIR/$NAME"
+    TARGET="$DIR/$NAME"
+    rm -rf "$TARGET"
+    cp -R "$SRC" "$TARGET"
+    find "$TARGET/scripts" -type f -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
+  done
+  COUNT="$(printf "%s\n" "$SKILL_NAMES" | sed '/^$/d' | wc -l | tr -d ' ')"
+  printf "  ✓ %s → %s (%s skills)\n" "$LABEL" "$DIR" "$COUNT"
 done
 
 # ---- next-step hints ----
@@ -204,6 +222,15 @@ Next steps:
        [mcp_servers.agent-bus]
        command = "/absolute/path/to/agent-bus-mcp"
 
+   - Kimi Code:
+       Prefer the plugin install:
+         /plugins install https://github.com/MustaphaSteph/agent-bus-plugins
+         /plugins mcp enable agent-bus agent-bus
+         /reload
+       Terminal fallback for Kimi builds that do not auto-enable MCP:
+         kimi mcp add agent-bus -- agent-bus-mcp
+         kimi mcp test agent-bus
+
    - Cursor / Gemini CLI / Goose / OpenCode / Junie / Amp / Kiro:
        see the tool's own MCP-server registration docs. The skill will
        work the moment any one of them has the agent-bus MCP loaded.
@@ -222,6 +249,7 @@ For the turn-key plugin install (instead of the manual skill drop):
 
    - Claude Code: /plugin > Marketplaces > Add MustaphaSteph/agent-bus-plugins > install agent-bus
    - Codex:       codex plugin marketplace add MustaphaSteph/agent-bus-plugins
+   - Kimi Code:   /plugins install https://github.com/MustaphaSteph/agent-bus-plugins
 
 Source: https://github.com/MustaphaSteph/agent-bus
 TIPS

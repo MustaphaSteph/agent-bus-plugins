@@ -7,10 +7,15 @@
   <a href="LICENSE"><img src="https://img.shields.io/github/license/MustaphaSteph/agent-bus-plugins.svg" alt="license" /></a>
 </p>
 
-Codex and Claude Code plugins that bundle:
+Plugins and Agent Skills for Claude Code, Codex, Kimi Code, Cursor, and
+other MCP-capable coding agents. They bundle:
 
 - The **agent-bus MCP server** ([`@agent-bus-connect/cli`](https://www.npmjs.com/package/@agent-bus-connect/cli)) — 65 tools plus CLI/UI views for agent-to-agent messaging, the local `agent-bus ui` web cockpit, async asks, truncation-safe inbox previews, exact message fetches, team-scoped send/ask/delegation/boards, roster cleanup, team chat, activity timelines, cockpit dashboards, visible current-work updates, workflow Kanban, tasks, task progress events, result bundles, cancellation, channels, capability routing, status boards, acknowledgements, review gates, handoffs, scope checks, decisions, memories, session briefs, and final reports.
-- The **universal `agent-bus` Agent Skill** — natural-language coordinator playbook ("ask the reviewer", "delegate this", "get a second opinion", "put worker-2 to sleep", "final merge report") that translates intent into tool calls without users naming tools or parameters.
+- The **universal `agent-bus` Agent Skill** plus small router skills —
+  natural-language coordinator playbooks ("ask the reviewer", "delegate
+  this", "get a second opinion", "put worker-2 to sleep", "final merge
+  report") that translate intent into tool calls without users naming
+  tools or parameters.
 - Optional **Stop hook** for listener resilience (Claude Code: on by default; Codex: opt-in).
 
 Source code for the bus itself lives at <https://github.com/MustaphaSteph/agent-bus>.
@@ -35,6 +40,39 @@ That puts `agent-bus` (CLI) and `agent-bus-mcp` (MCP stdio server) on your PATH.
 
 ### 2. Choose your host plugin/skill install
 
+#### Kimi Code
+
+Kimi Code can install directly from the GitHub repo because this repo
+ships Kimi manifests at the root. Current Kimi builds look for
+`plugin.json`; newer docs also describe `kimi.plugin.json` and
+`.kimi-plugin/plugin.json`, so this repo includes all three. Kimi plugin
+installs do not run shell/npm scripts, so keep step 1 above.
+
+In Kimi Code:
+
+```text
+/plugins install https://github.com/MustaphaSteph/agent-bus-plugins
+/plugins mcp enable agent-bus agent-bus
+/reload
+```
+
+If your Kimi build installs the plugin but does not enable the MCP server
+automatically, add it once from a terminal:
+
+```bash
+kimi mcp add agent-bus -- agent-bus-mcp
+kimi mcp test agent-bus
+```
+
+Or open the interactive manager:
+
+```text
+/plugins
+```
+
+The Kimi plugin loads `agent-bus-read-first` at session start, exposes
+the root `skills/` tree, and declares the `agent-bus-mcp` stdio server.
+
 #### Codex (CLI + Desktop)
 
 Step 1 — add the marketplace:
@@ -58,13 +96,19 @@ Then re-install or reload the plugin. Without the hook, listener mode still work
 
 #### Cursor / Gemini CLI / Goose / OpenCode / Junie / Amp / Kiro / others
 
-If your tool supports the open [Agent Skills](https://agentskills.io) format but doesn't have a plugin marketplace, use the universal installer:
+This repo also ships a root `.cursor-plugin/plugin.json` in the same
+style as HyperFrames. For tools that support the open
+[Agent Skills](https://agentskills.io) format but do not have a plugin
+marketplace, use the universal installer:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/MustaphaSteph/agent-bus-plugins/main/install.sh | sh
 ```
 
-It auto-detects every supported tool's config directory under `$HOME` and drops the canonical `agent-bus` skill into each one's `skills/` folder. Then prints the per-tool MCP-server registration hints so you can finish wiring up the bus.
+It auto-detects every supported tool's config directory under `$HOME`
+and drops the full agent-bus skill pack into each one's `skills/`
+folder. Then prints the per-tool MCP-server registration hints so you
+can finish wiring up the bus.
 
 Options:
 
@@ -122,11 +166,42 @@ To install/upgrade the CLI from the checker explicitly:
 ~/.codex/skills/agent-bus/scripts/check-setup.sh --install-cli
 ```
 
+## How this repo supports many agents
+
+The package follows a skills-first layout:
+
+- **Root manifests** for broad plugin clients:
+  `.codex-plugin/plugin.json`, `.claude-plugin/plugin.json`,
+  `.cursor-plugin/plugin.json`, and `kimi.plugin.json`.
+- **Root `skills/` tree** for universal Agent Skills installs:
+  `agent-bus-read-first`, `agent-bus-cli`, `agent-bus-coordinator`,
+  `agent-bus-listener`, `agent-bus-workflows`, plus the full canonical
+  `agent-bus` skill.
+- **Legacy plugin bodies** for the current Claude/Codex marketplace
+  flows under `claude-code/plugins/agent-bus/` and
+  `plugins/agent-bus/`.
+- **One npm CLI/MCP package** (`@agent-bus-connect/cli`) used by every
+  host. The plugin teaches the agent; the CLI/MCP server does the work.
+
 ## Repo layout
 
 ```
 .
+├── .codex-plugin/plugin.json          ← root Codex-compatible manifest
+├── .claude-plugin/plugin.json         ← root Claude-compatible manifest
 ├── .agents/plugins/marketplace.json   ← Codex marketplace at root
+├── .cursor-plugin/plugin.json         ← root Cursor-compatible manifest
+├── kimi.plugin.json                   ← Kimi Code plugin manifest
+├── .kimi-plugin/plugin.json           ← Kimi compatibility manifest
+├── plugin.json                        ← Kimi 1.47 compatibility manifest
+├── .mcp.json                          ← root MCP declaration
+├── skills/                            ← root skills-first install surface
+│   ├── agent-bus/                     (vendored from main repo)
+│   ├── agent-bus-read-first/
+│   ├── agent-bus-cli/
+│   ├── agent-bus-coordinator/
+│   ├── agent-bus-listener/
+│   └── agent-bus-workflows/
 ├── plugins/agent-bus/                 ← Codex plugin body
 │   ├── .codex-plugin/plugin.json
 │   ├── .mcp.json                       (command: agent-bus-mcp)
@@ -140,7 +215,7 @@ To install/upgrade the CLI from the checker explicitly:
 │   ├── hooks-handlers/stop-hook.sh
 │   └── skills/agent-bus/              (vendored, same content as Codex copy)
 ├── install.sh                         ← universal fallback for skills-aware tools
-├── scripts/sync-skill.sh              ← vendors skill into BOTH plugin paths
+├── scripts/sync-skill.sh              ← vendors canonical skill into root + plugin paths
 ├── .sync-version                       ← what tag/commit the vendored skill came from
 └── package.json
 ```
@@ -149,12 +224,15 @@ To install/upgrade the CLI from the checker explicitly:
 
 The skill is **vendored**, not git-submoduled. Single canonical copy lives in the [main `agent-bus` repo](https://github.com/MustaphaSteph/agent-bus/tree/main/skills/agent-bus) at the ref listed in `.sync-version`. CI fails any PR that ships a vendored copy that drifts from the pinned ref.
 
-Bumping the skill means:
+Bumping the canonical skill means:
 
 1. Update + commit the skill in the main repo.
 2. In this repo, bump the pinned ref in `scripts/sync-skill.sh` when needed.
 3. Run `npm run sync-skill`.
-4. Commit the regenerated `plugins/agent-bus/skills/agent-bus/` and `.sync-version`.
+4. Commit the regenerated `skills/agent-bus/`,
+   `plugins/agent-bus/skills/agent-bus/`,
+   `claude-code/plugins/agent-bus/skills/agent-bus/`, and
+   `.sync-version`.
 5. Push.
 
 For local dev iteration without tagging, use `npm run sync-skill:dev` (reads from `../agent-bus/`).
@@ -167,6 +245,7 @@ For local dev iteration without tagging, use `npm run sync-skill:dev` (reads fro
 | Setup checker says CLI is missing or old | Run `<skills-dir>/agent-bus/scripts/check-setup.sh --install-cli` to install/upgrade via npm. |
 | Setup checker still says `agent-bus X is older than required Y` after installing latest | The plugin/skill is ahead of the published npm CLI. Check `npm view @agent-bus-connect/cli version`; publish the required CLI version first, or lower `MIN_AGENT_BUS` to the latest published version before releasing the plugin. |
 | Skill installed but tools not visible | Open a NEW session — Claude Code / Codex read MCP config at session start. |
+| Kimi plugin installed but `kimi mcp list` is empty | Run `kimi mcp add agent-bus -- agent-bus-mcp`, then `kimi mcp test agent-bus`. Some Kimi builds install skills from the plugin manifest but still require manual MCP registration. |
 | Codex Stop hook doesn't trigger | Check `[features].plugin_hooks = true` in `~/.codex/config.toml` and reload the plugin. Without that flag, plugin-bundled hooks are inert in Codex. |
 | Setup check exit non-zero | Read the printed install hint; the script's exit message tells you exactly what's missing. |
 

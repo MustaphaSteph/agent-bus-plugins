@@ -1,0 +1,14 @@
+{
+  "name": "agent-bus",
+  "version": "0.32.0",
+  "description": "Local message bus for AI agent-to-agent communication. Adds the agent-bus MCP server, skills-first workflow guidance, and compatibility with Claude, Codex, Cursor, Kimi, Gemini CLI, and other MCP-capable sessions.",
+  "author": {
+    "name": "Mustapha Achtaou",
+    "url": "https://github.com/MustaphaSteph"
+  },
+  "homepage": "https://github.com/MustaphaSteph/agent-bus",
+  "repository": "https://github.com/MustaphaSteph/agent-bus-plugins",
+  "license": "MIT",
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json"
+}

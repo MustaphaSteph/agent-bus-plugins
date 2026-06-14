@@ -7,8 +7,8 @@
     {
       "name": "agent-bus",
       "source": {
-        "source": "local",
-        "path": "./plugins/agent-bus"
+        "source": "url",
+        "url": "https://github.com/MustaphaSteph/agent-bus-plugins.git"
       },
       "policy": {
         "installation": "AVAILABLE",

@@ -1,7 +1,7 @@
 #!/bin/sh
 # sync-skill.sh — vendor skills/agent-bus/ from the agent-bus repo into
-# plugins/agent-bus/skills/agent-bus/ so both Codex and Claude Code plugins
-# ship the same skill body.
+# every plugin skill surface so Codex, Claude Code, Kimi, Cursor, and
+# generic Agent Skills installs ship the same skill body.
 #
 # Two modes:
 #   1. CI / release  (default)       Pull from a pinned ref of MustaphaSteph/agent-bus.
@@ -11,7 +11,9 @@
 #   --check          Verify vendored copy matches the source; exit non-zero on drift.
 #
 # Output:
-#   plugins/agent-bus/skills/agent-bus/   <- vendored skill body
+#   skills/agent-bus/                      <- root/universal skill body
+#   plugins/agent-bus/skills/agent-bus/    <- Codex plugin skill body
+#   claude-code/plugins/agent-bus/skills/agent-bus/
 #   .sync-version                          <- source path + ref + timestamp
 
 set -e
@@ -20,9 +22,9 @@ DEFAULT_PINNED_TAG="main"
 DEFAULT_REPO_URL="https://github.com/MustaphaSteph/agent-bus.git"
 SKILL_SUBPATH="skills/agent-bus"
 
-# Vendored copies live in BOTH the Codex plugin and the Claude Code plugin.
-# Both must match the source; sync writes/checks both.
-PLUGIN_SKILL_DIRS="plugins/agent-bus/skills/agent-bus claude-code/plugins/agent-bus/skills/agent-bus"
+# Vendored copies live in the root skill tree and in both legacy plugin
+# bodies. All must match the source; sync writes/checks each one.
+PLUGIN_SKILL_DIRS="skills/agent-bus plugins/agent-bus/skills/agent-bus claude-code/plugins/agent-bus/skills/agent-bus"
 
 CHECK_MODE=0
 if [ "${1:-}" = "--check" ]; then
