@@ -1,6 +1,6 @@
 {
   "name": "agent-bus",
-  "version": "0.36.0",
+  "version": "0.37.0",
   "description": "Local message bus for coordinating Claude, Codex, Kimi, Cursor, Gemini CLI, and other MCP-capable agent sessions on the same machine.",
   "keywords": [
     "mcp",
