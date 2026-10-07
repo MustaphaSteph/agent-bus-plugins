@@ -1,6 +1,6 @@
 {
   "name": "agent-bus-plugins",
-  "version": "0.32.0",
+  "version": "0.33.0",
   "private": true,
   "description": "Agent-bus plugins and skills for Claude Code, Codex, Kimi Code, Cursor, and other MCP-capable agents.",
   "license": "MIT",
