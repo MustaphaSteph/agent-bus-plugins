@@ -1,6 +1,6 @@
 {
   "name": "agent-bus",
-  "version": "0.37.0",
+  "version": "0.38.0",
   "description": "Local message bus for AI agent-to-agent communication. Adds the agent-bus MCP server, skills-first workflow guidance, and compatibility with Claude, Codex, Cursor, Kimi, Gemini CLI, and other MCP-capable sessions.",
   "author": {
     "name": "Mustapha Achtaou",

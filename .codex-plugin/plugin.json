@@ -1,6 +1,6 @@
 {
   "name": "agent-bus",
-  "version": "0.37.0",
+  "version": "0.38.0",
   "description": "Local message bus for agent-to-agent communication across Claude, Codex, Cursor, Kimi, Gemini CLI, and other MCP-capable sessions on the same machine.",
   "author": {
     "name": "Mustapha Achtaou",
