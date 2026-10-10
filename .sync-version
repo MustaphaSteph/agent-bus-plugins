@@ -1,7 +1,7 @@
 {
-  "source": "local:/Users/air/Documents/Projects/agent-bus",
-  "ref": "8ecd7ec",
-  "dirty": "dirty",
+  "source": "ref:main",
+  "ref": "87e0e9e",
+  "dirty": "",
   "skill_path": "skills/agent-bus",
-  "synced_at": "2026-10-07T18:45:59Z"
+  "synced_at": "2026-10-10T17:41:20Z"
 }
