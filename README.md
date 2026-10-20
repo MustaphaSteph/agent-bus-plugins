@@ -20,6 +20,18 @@ other MCP-capable coding agents. They bundle:
 
 Source code for the bus itself lives at <https://github.com/MustaphaSteph/agent-bus>.
 
+### Native wake bridges (source build)
+
+The Agent Bus source build now offers Local `claude-channel --agent <name>`
+and `codex-listen --agent <name> --thread <id> --cwd <path>`, alongside Cloud
+variants. These commands are not included merely by updating this plugin or
+deploying Cloud, and are not yet part of the published CLI release. Use the
+source build and its `docs/native-wake.md` setup guide. Local bridges need no
+Cloud token. They own a dedicated receiving agent, record a reply before ack,
+and must not share that inbox with `/listen` or a Stop-hook consumer. Claude
+requires channel consent; Codex uses a dedicated saved thread, not an active
+desktop chat. Existing plugin defaults and tool counts are unchanged.
+
 ## Install Order
 
 Install the npm CLI first, then install the plugin. The plugin declares
